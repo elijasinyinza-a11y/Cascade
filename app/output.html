@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cascade Output — Karis Cascade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="../assets/css/karis-cascade.css" />
+  <style>
+    body { background: var(--page-bg); overflow: hidden; }
+
+    /* ── APP SHELL ── */
+    .app-shell {
+      display: grid;
+      grid-template-rows: 52px 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── CONTENT AREA ── */
+    .content-area {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      overflow: hidden;
+    }
+
+    /* ══════════════════════════════
+       LEFT RAIL
+    ══════════════════════════════ */
+    .rail {
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .rail-section {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rail-label {
+      font-size: .65rem; font-weight: 700;
+      letter-spacing: .09em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 8px;
+      padding: 0 4px;
+    }
+
+    /* goal buttons */
+    .g-btn {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 8px 8px; border-radius: 8px; width: 100%;
+      cursor: pointer; border: 1px solid transparent;
+      background: transparent; text-align: left;
+      font-family: 'Inter', sans-serif;
+      transition: all .15s; margin-bottom: 2px;
+    }
+    .g-btn:hover { background: var(--page-bg); }
+    .g-btn.active {
+      background: var(--violet-light);
+      border-color: rgba(124,92,191,.25);
+    }
+    .g-num {
+      font-size: .68rem; font-weight: 700;
+      color: var(--text-muted); min-width: 14px; padding-top: 2px;
+    }
+    .g-btn.active .g-num { color: var(--violet-dark); }
+    .g-text {
+      font-size: .78rem; color: var(--text-secondary);
+      line-height: 1.4; flex: 1;
+    }
+    .g-btn.active .g-text { color: var(--text-primary); font-weight: 500; }
+    .g-status {
+      width: 7px; height: 7px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 4px;
+    }
+    .gs-ok   { background: var(--teal); }
+    .gs-warn { background: var(--warn); }
+
+    /* view toggle */
+    .view-toggle {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .vt-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px; border-radius: 7px;
+      border: 1px solid transparent; background: transparent;
+      font-family: 'Inter', sans-serif; font-size: .78rem;
+      font-weight: 500; color: var(--text-muted);
+      cursor: pointer; transition: all .15s; text-align: left;
+      width: 100%;
+    }
+    .vt-btn:hover { background: var(--page-bg); color: var(--text-secondary); }
+    .vt-btn.active {
+      background: var(--navy); color: #fff;
+      border-color: var(--navy);
+    }
+    .vt-btn i { font-size: 15px; flex-shrink: 0; }
+
+    /* integrity summary */
+    .integrity-wrap {
+      margin-top: auto;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .int-card {
+      background: var(--page-bg);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .int-title {
+      font-size: .65rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;
+    }
+    .int-row {
+      display: flex; align-items: center; gap: 7px; margin-bottom: 5px;
+    }
+    .int-row:last-child { margin-bottom: 0; }
+    .int-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .int-name { font-size: .75rem; color: var(--text-secondary); flex: 1; }
+    .int-score { font-size: .75rem; font-weight: 700; }
+    .score-ok   { color: var(--teal); }
+    .score-warn { color: var(--warn); }
+
+    /* ══════════════════════════════
+       MAIN CANVAS
+    ══════════════════════════════ */
+    .main {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* top bar — goal header + view tabs */
+    .main-topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px 12px;
+      flex-shrink: 0;
+    }
+    .topbar-eyebrow {
+      font-size: .65rem; font-weight: 700; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--violet);
+      display: flex; align-items: center; gap: 6px; margin-bottom: 5px;
+    }
+    .goal-title-text {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem; color: var(--text-primary);
+      line-height: 1.2; margin-bottom: 8px;
+    }
+    .topbar-meta {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .meta-pill {
+      font-size: .72rem; color: var(--text-secondary);
+      background: var(--page-bg); border: 1px solid var(--border);
+      border-radius: 99px; padding: 2px 10px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .meta-pill i { font-size: 11px; color: var(--text-muted); }
+
+    .view-bar {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 8px 28px;
+      background: var(--page-bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .vbar-hint { font-size: .75rem; color: var(--text-muted); }
+    .vbar-tabs { display: flex; gap: 4px; }
+    .vbar-tab {
+      padding: 5px 14px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--white);
+      font-family: 'Inter', sans-serif; font-size: .75rem;
+      font-weight: 500; color: var(--text-muted); cursor: pointer;
+      transition: all .15s;
+    }
+    .vbar-tab:hover { color: var(--text-secondary); border-color: var(--border-strong); }
+    .vbar-tab.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+    /* scrollable content */
+    .main-scroll {
+      flex: 1; overflow-y: auto; padding: 24px 28px 40px;
+    }
+
+    /* ══════════════════════════════
+       CASCADE CHAIN VIEW
+    ══════════════════════════════ */
+    .chain { max-width: 640px; }
+
+    .c-node { margin-bottom: 4px; }
+
+    .c-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+      cursor: pointer;
+      border-left: 3px solid var(--border);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .c-card:hover { border-color: var(--border-strong); }
+    .c-card:hover { border-left-color: inherit; }
+    .c-card.open {
+      border-color: var(--border-strong);
+      box-shadow: 0 2px 12px rgba(0,0,0,.07);
+    }
+    /* level colours — left stripe only, no labels */
+    .lc-0 { border-left-color: #1D9E75; }
+    .lc-1 { border-left-color: #2563EB; }
+    .lc-2 { border-left-color: #16A34A; }
+    .lc-3 { border-left-color: #D97706; }
+    .lc-4 { border-left-color: #7C3AED; }
+    .lc-5 { border-left-color: #DC2626; }
+
+    .c-summary {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px;
+    }
+    .cs-level {
+      font-size: .68rem; font-weight: 700;
+      letter-spacing: .05em; text-transform: uppercase;
+      min-width: 64px; flex-shrink: 0;
+    }
+    .cl-0 { color: #1D9E75; }
+    .cl-1 { color: #2563EB; }
+    .cl-2 { color: #16A34A; }
+    .cl-3 { color: #D97706; }
+    .cl-4 { color: #7C3AED; }
+    .cl-5 { color: #DC2626; }
+
+    .cs-kpi {
+      font-size: .875rem; color: var(--text-primary);
+      flex: 1; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .cs-owner {
+      font-size: .7rem; color: var(--text-muted);
+      background: var(--page-bg); border: 1px solid var(--border);
+      padding: 2px 8px; border-radius: 99px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .cs-chev {
+      font-size: 13px; color: var(--text-muted);
+      flex-shrink: 0; transition: transform .2s;
+    }
+    .c-card.open .cs-chev { transform: rotate(180deg); }
+
+    .c-body {
+      display: none; padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      background: #FAFBFD;
+    }
+    .c-card.open .c-body { display: block; }
+
+    .cb-kpi {
+      font-size: .9rem; font-weight: 600;
+      color: var(--text-primary); margin-bottom: 3px;
+    }
+    .cb-target {
+      font-size: .8rem; color: var(--text-muted);
+      margin-bottom: 14px; line-height: 1.5;
+    }
+    .cb-meta {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 8px; margin-bottom: 14px;
+    }
+    .cbm-item {}
+    .cbm-label {
+      font-size: .65rem; font-weight: 700; letter-spacing: .05em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px;
+    }
+    .cbm-val { font-size: .8rem; color: var(--text-secondary); }
+
+    .cb-tasks-label {
+      font-size: .65rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;
+    }
+    .cb-tasks { display: flex; flex-direction: column; gap: 4px; }
+    .cb-task {
+      display: flex; align-items: flex-start; gap: 8px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px 10px;
+      font-size: .8rem; color: var(--text-secondary); line-height: 1.45;
+    }
+    .cb-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 5px;
+    }
+
+    .cb-actions {
+      display: flex; gap: 6px; margin-top: 12px;
+    }
+    .cb-btn {
+      padding: 5px 12px; border-radius: 6px;
+      border: 1px solid var(--border); background: transparent;
+      font-family: 'Inter', sans-serif; font-size: .75rem;
+      font-weight: 500; color: var(--text-secondary);
+      cursor: pointer; display: flex; align-items: center; gap: 5px;
+      transition: all .15s;
+    }
+    .cb-btn:hover { background: var(--page-bg); border-color: var(--border-strong); }
+    .cb-btn.push {
+      background: var(--navy); color: #fff; border-color: var(--navy);
+    }
+    .cb-btn.push:hover { background: var(--navy-mid); }
+
+    /* connector */
+    .c-conn {
+      height: 14px; padding-left: 20px;
+      display: flex;
+    }
+    .c-conn-line { width: 1.5px; background: var(--border-strong); }
+
+    /* integrity strip */
+    .integrity-strip {
+      margin-top: 20px; max-width: 640px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px;
+    }
+    .is-top {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 10px;
+    }
+    .is-title { font-size: .8rem; font-weight: 600; color: var(--text-primary); }
+    .is-score { font-size: .8rem; font-weight: 700; }
+    .is-track {
+      height: 4px; background: var(--page-bg);
+      border-radius: 99px; overflow: hidden; margin-bottom: 10px;
+    }
+    .is-fill { height: 100%; border-radius: 99px; transition: width .5s; }
+    .fill-ok   { background: var(--teal); }
+    .fill-warn { background: var(--warn); }
+    .is-checks {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
+    }
+    .is-check {
+      display: flex; align-items: flex-start; gap: 6px;
+      font-size: .75rem; color: var(--text-secondary); line-height: 1.4;
+    }
+    .is-check i { flex-shrink: 0; margin-top: 1px; }
+    .ic-ok   { color: var(--teal); }
+    .ic-warn { color: var(--warn); }
+
+    /* ══════════════════════════════
+       DEPT VIEW
+    ══════════════════════════════ */
+    .dept-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; max-width: 640px;
+    }
+    .dept-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px;
+    }
+    .dc-dept {
+      font-size: .65rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px;
+    }
+    .dc-kpi {
+      font-size: .875rem; font-weight: 600;
+      color: var(--text-primary); margin-bottom: 10px; line-height: 1.3;
+    }
+    .dc-tasks { list-style: none; }
+    .dc-tasks li {
+      font-size: .8rem; color: var(--text-secondary);
+      padding: 5px 0; border-bottom: 1px solid var(--border);
+      padding-left: 12px; position: relative; line-height: 1.4;
+    }
+    .dc-tasks li:last-child { border-bottom: none; }
+    .dc-tasks li::before {
+      content: ''; position: absolute; left: 0; top: 10px;
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--border-strong);
+    }
+
+    /* ══════════════════════════════
+       INDIVIDUAL VIEW
+    ══════════════════════════════ */
+    .ind-wrap { max-width: 560px; }
+    .ind-role {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .82rem; font-weight: 500; color: var(--text-secondary);
+      margin-bottom: 16px;
+      padding: 10px 14px; background: var(--white);
+      border: 1px solid var(--border); border-radius: 8px;
+    }
+    .ind-role i { color: var(--violet); font-size: 16px; }
+
+    .ind-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .ind-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px;
+    }
+    .ind-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .ind-badge {
+      font-size: .65rem; font-weight: 700; padding: 3px 9px;
+      border-radius: 99px; letter-spacing: .04em; flex-shrink: 0;
+    }
+    .ind-name { font-size: .875rem; font-weight: 600; color: var(--text-primary); flex: 1; }
+    .ind-freq { font-size: .72rem; color: var(--text-muted); flex-shrink: 0; }
+    .ind-tasks { list-style: none; }
+    .ind-tasks li {
+      font-size: .8rem; color: var(--text-secondary);
+      padding: 5px 0 5px 12px; border-bottom: 1px solid var(--border);
+      position: relative; line-height: 1.4;
+    }
+    .ind-tasks li:last-child { border-bottom: none; }
+    .ind-tasks li::before {
+      content: ''; position: absolute; left: 0; top: 10px;
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--border-strong);
+    }
+
+    /* line of sight */
+    .los {
+      background: var(--teal-light); border: 1px solid #9FE1CB;
+      border-radius: 10px; padding: 14px 16px;
+    }
+    .los-top {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 8px;
+    }
+    .los-label { font-size: .8rem; font-weight: 600; color: var(--teal-dark); }
+    .los-val   { font-size: .8rem; font-weight: 700; color: var(--teal); }
+    .los-track {
+      height: 3px; background: #9FE1CB;
+      border-radius: 99px; overflow: hidden; margin-bottom: 10px;
+    }
+    .los-fill { height: 100%; background: var(--teal); border-radius: 99px; }
+    .los-checks {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+    }
+    .los-check {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .75rem; color: var(--teal-dark);
+    }
+    .los-check i { font-size: 13px; color: var(--teal); }
+
+    /* ══════════════════════════════
+       EXPORT PANEL (slide-in)
+    ══════════════════════════════ */
+    .export-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.4); z-index: 200;
+      align-items: flex-end; justify-content: center;
+    }
+    .export-overlay.open { display: flex; }
+    .export-panel {
+      background: var(--white); border-radius: 16px 16px 0 0;
+      padding: 24px 28px 36px; width: 100%; max-width: 480px;
+      animation: slideUp .25s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .ep-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .ep-title { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
+    .ep-close {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--page-bg); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: var(--text-muted); transition: background .15s;
+    }
+    .ep-close:hover { background: var(--border); }
+    .export-opts { display: flex; flex-direction: column; gap: 8px; }
+    .export-opt {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; border: 1px solid var(--border);
+      border-radius: 10px; cursor: pointer; transition: all .15s;
+      background: var(--white);
+    }
+    .export-opt:hover { border-color: var(--violet); background: var(--violet-light); }
+    .eo-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: var(--violet-light); display: flex;
+      align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .eo-icon i { font-size: 18px; color: var(--violet); }
+    .eo-label { font-size: .875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1px; }
+    .eo-sub   { font-size: .75rem; color: var(--text-muted); }
+
+    /* ══════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════ */
+    @media (max-width: 900px) {
+      body { overflow: auto; }
+      .app-shell { grid-template-rows: 52px auto; height: auto; }
+      .content-area { grid-template-columns: 1fr; }
+      .rail { display: none; }
+      .main { overflow: visible; }
+      .main-scroll { overflow: visible; }
+      .dept-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .main-topbar { padding: 12px 16px; }
+      .view-bar    { padding: 8px 16px; }
+      .main-scroll { padding: 16px 16px 40px; }
+      .cb-meta { grid-template-columns: 1fr 1fr; }
+      .los-checks { grid-template-columns: 1fr; }
+      .is-checks  { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- APP NAV -->
+  <nav class="app-nav" role="navigation" aria-label="Cascade app navigation">
+    <div class="app-nav-left">
+      <a href="https://karismind.com" class="back-link">
+        <i class="ti ti-arrow-left" style="font-size:12px"></i>Karis Mind
+      </a>
+      <span class="nav-sep">›</span>
+      <span class="nav-product">
+        <span class="nav-product-dot"></span>Cascade
+      </span>
+    </div>
+    <div class="app-nav-right">
+      <button class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif" onclick="openExport()">
+        <i class="ti ti-download" style="font-size:14px;vertical-align:middle;margin-right:4px"></i>Export
+      </button>
+      <button class="nav-link" style="background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;color:#A78BFA;font-weight:600">
+        <i class="ti ti-arrow-right" style="font-size:14px;vertical-align:middle;margin-right:4px"></i>Push to Performance
+      </button>
+      <a href="sessions.html" class="nav-link">Sessions</a>
+      <div class="nav-avatar" title="Your account">BM</div>
+    </div>
+  </nav>
+
+  <!-- CONTENT AREA -->
+  <div class="content-area">
+
+    <!-- LEFT RAIL -->
+    <aside class="rail" role="complementary" aria-label="Goal navigation">
+
+      <div class="rail-section">
+        <div class="rail-label">Session goals</div>
+        <button class="g-btn active" id="gb-0" onclick="setGoal(0,this)">
+          <span class="g-num">1</span>
+          <span class="g-text">Financial sustainability</span>
+          <span class="g-status gs-ok" title="5/5 integrity checks passed"></span>
+        </button>
+        <button class="g-btn" id="gb-1" onclick="setGoal(1,this)">
+          <span class="g-num">2</span>
+          <span class="g-text">Reliable water supply</span>
+          <span class="g-status gs-warn" title="4/5 integrity checks passed"></span>
+        </button>
+        <button class="g-btn" id="gb-2" onclick="setGoal(2,this)">
+          <span class="g-num">3</span>
+          <span class="g-text">Sanitation access</span>
+          <span class="g-status gs-warn" title="3/5 integrity checks passed"></span>
+        </button>
+        <button class="g-btn" id="gb-3" onclick="setGoal(3,this)">
+          <span class="g-num">4</span>
+          <span class="g-text">Customer service</span>
+          <span class="g-status gs-ok" title="4/5 integrity checks passed"></span>
+        </button>
+      </div>
+
+      <div class="rail-section">
+        <div class="rail-label">View</div>
+        <div class="view-toggle" role="group" aria-label="Content view">
+          <button class="vt-btn active" id="vt-chain" onclick="setViewRail('chain',this)">
+            <i class="ti ti-git-branch" aria-hidden="true"></i> Cascade chain
+          </button>
+          <button class="vt-btn" id="vt-dept" onclick="setViewRail('dept',this)">
+            <i class="ti ti-building" aria-hidden="true"></i> By department
+          </button>
+          <button class="vt-btn" id="vt-ind" onclick="setViewRail('ind',this)">
+            <i class="ti ti-user" aria-hidden="true"></i> My contract
+          </button>
+        </div>
+      </div>
+
+      <div class="integrity-wrap">
+        <div class="int-card">
+          <div class="int-title">Integrity</div>
+          <div class="int-row">
+            <div class="int-dot gs-ok"></div>
+            <div class="int-name">Financial</div>
+            <div class="int-score score-ok">5/5</div>
+          </div>
+          <div class="int-row">
+            <div class="int-dot gs-warn"></div>
+            <div class="int-name">Water supply</div>
+            <div class="int-score score-warn">4/5</div>
+          </div>
+          <div class="int-row">
+            <div class="int-dot gs-warn"></div>
+            <div class="int-name">Sanitation</div>
+            <div class="int-score score-warn">3/5</div>
+          </div>
+          <div class="int-row">
+            <div class="int-dot gs-ok"></div>
+            <div class="int-name">Customer</div>
+            <div class="int-score score-ok">4/5</div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main" role="main">
+
+      <!-- TOPBAR -->
+      <div class="main-topbar">
+        <div class="topbar-eyebrow">
+          <i class="ti ti-target" style="font-size:12px" aria-hidden="true"></i>
+          <span id="tb-eyebrow">Corporate goal · LpWSC FY-2026</span>
+        </div>
+        <div class="goal-title-text" id="tb-title">
+          Enhance financial sustainability and operational efficiency
+        </div>
+        <div class="topbar-meta" id="tb-meta">
+          <span class="meta-pill">
+            <i class="ti ti-currency-dollar" aria-hidden="true"></i>ZMW 13,599,400
+          </span>
+          <span class="meta-pill">
+            <i class="ti ti-user" aria-hidden="true"></i>Director of Finance
+          </span>
+        </div>
+      </div>
+
+      <!-- VIEW BAR -->
+      <div class="view-bar">
+        <span class="vbar-hint" id="vbar-hint">6 delivery levels · tap any row to expand</span>
+        <div class="vbar-tabs" role="tablist" aria-label="View selection">
+          <button class="vbar-tab active" role="tab" onclick="setView('chain',this)">Cascade</button>
+          <button class="vbar-tab" role="tab" onclick="setView('dept',this)">By department</button>
+          <button class="vbar-tab" role="tab" onclick="setView('ind',this)">My contract</button>
+        </div>
+      </div>
+
+      <!-- SCROLLABLE CONTENT -->
+      <div class="main-scroll">
+
+        <!-- ══ GOAL 1 — CASCADE ══ -->
+        <div id="v-g0-chain" class="view-panel chain">
+
+          <div class="c-node">
+            <div class="c-card lc-0" id="n-0" onclick="toggleNode('n-0')">
+              <div class="c-summary">
+                <span class="cs-level cl-0">Corporate</span>
+                <span class="cs-kpi">Cost recovery ratio ≥ 100% · Self-sustaining operations</span>
+                <span class="cs-owner">Board / MD</span>
+                <i class="ti ti-chevron-down cs-chev" aria-hidden="true"></i>
+              </div>
+              <div class="c-body">
+                <div class="cb-kpi">Cost recovery ratio ≥ 100%</div>
+                <div class="cb-target">Financial sustainability enshrined as the primary strategic priority — operational self-sufficiency by December 2026.</div>
+                <div class="cb-meta">
+                  <div class="cbm-item"><div class="cbm-label">Owner</div><div class="cbm-val">Board / MD</div></div>
+                  <div class="cbm-item"><div class="cbm-label">Frequency</div><div class="cbm-val">Annual Board review</div></div>
+                  <div class="cbm-item"><div class="cbm-label">Evidence</div><div class="cbm-val">Audited statements</div></div>
+                </div>
+                <div class="cb-tasks-label">Decisions at this level</div>
+                <div class="cb-tasks">
+                  <div class="cb-task"><div class="cb-dot" style="background:#1D9E75"></div>Board ratifies financial sustainability as primary strategic priority for FY-2026</div>
+                  <div class="cb-task"><div class="cb-dot" style="background:#1D9E75"></div>MD reports quarterly on cost recovery trajectory — no deferral</div>
+                </div>
+                <div class="cb-actions">
+                  <button class="cb-btn"><i class="ti ti-edit" aria-hidden="true"></i> Edit</button>
+                  <button class="cb-btn"><i class="ti ti-user-plus" aria-hidden="true"></i> Assign owner</button>
+                  <button class="cb-btn push"><i class="ti ti-arrow-right" aria-hidden="true"></i> Push level</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="c-conn"><div class="c-conn-line"></div></div>
+
+          <div class="c-node">
+            <div class="c-card lc-1" id="n-1" onclick="toggleNode('n-1')">
+              <div class="c-summary">
+                <span class="cs-level cl-1">Operations</span>
+                <span class="cs-kpi">Billing efficiency 78% → ≥85% · 1,800 meters replaced</span>
+                <span class="cs-owner">Ag. MCS</span>
+                <i class="ti ti-chevron-down cs-chev" aria-hidden="true"></i>
+              </div>
+              <div class="c-body">
+                <div class="cb-kpi">Billing efficiency ≥ 85% by December 2026</div>
+                <div class="cb-target">Revenue generation process reformed through meter reading, e-payment integration, and database accuracy improvements.</div>
+                <div class="cb-meta">
+                  <div class="cbm-item"><div class="cbm-label">Owner</div><div class="cbm-val">Ag. MCS / Commercial</div></div>
+                  <div class="cbm-item"><div class="cbm-label">Frequency</div><div class="cbm-val">Monthly report</div></div>
+                  <div class="cbm-item"><div class="cbm-label">Evidence</div><div class="cbm-val">Commercial reports</div></div>
+                </div>
+                <div class="cb-tasks-label">Actions at this level</div>
+                <div class="cb-tasks">
+                  <div class="cb-task"><div class="cb-dot" style="background:#2563EB"></div>Upgrade mobile meter reading app with real-time data capture — February</div>
+                  <div class="cb-task"><div class="cb-dot" style="background:#2563EB"></div>Integrate ≥4 banks into e-payment platform — June</div>
+                  <div class="cb-task"><div class="cb-dot" style="background:#2563EB"></div>Replace 1,800 faulty meters · Reduce zero-consumption accounts 15%</div>
+                </div>
+                <div class="cb-actions">
+                  <button class="cb-btn"><i class="ti ti-edit" aria-hidden="true"></i> Edit</button>
+                  <button class="cb-btn"><i class="ti ti-user-plus" aria-hidden="true"></i> Assign owner</button>
+                  <button class="cb-btn push"><i class="ti ti-arrow-right" aria-hidden="true"></i> Push level</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="c-conn"><div class="c-conn-line"></div></div>
+
+          <div class="c-node">
+            <div class="c-card lc-2" id="n-2" onclick="toggleNode('n-2')">
+              <div class="c-summary">
+                <span class="cs-level cl-2">Staffing</span>
+                <span class="cs-kpi">Staff efficiency index improved · Multi-skilling plan by June</span>
+                <span class="cs-owner">MHRA</span>
+                <i class="ti ti-chevron-down cs-chev" aria-hidden="true"></i>
+              </div>
+              <div class="c-body">
+                <div class="cb-kpi">Personnel cost as % of billing revenue — reduced</div>
+                <div class="cb-target">Right-sized workforce aligned to operational goals through restructuring and multi-skilling by mid-year.</div>
+                <div class="cb-meta">
+                  <div class="cbm-item"><div class="cbm-label">Owner</div><div class="cbm-val">MHRA</div></div>
+                  <div class="cbm-item"><div class="cbm-label">Frequency</div><div class="cbm-val">Quarterly HR report</div></div>
+                  <div class="cbm-item"><div class="cbm-label">Evidence</div><div class="cbm-val">HR · Payroll analysis</div></div>
+                </div>
+                <div class="cb-tasks-label">Actions at this level</div>
+                <div class="cb-tasks">
+                  <div class="cb-task"><div class="cb-dot" style="background:#16A34A"></div>New organogram developed and Board-approved — December 2026</div>
+                  <div class="cb-task"><div class="cb-dot" style="background:#16A34A"></div>Multi-skilling programme designed and rolled out — June</div>
+                  <div class="cb-task"><div class="cb-dot" style="background:#16A34A"></div>All job descriptions updated and signed off — June</div>
+                </div>
+                <div class="cb-actions">
+                  <button class="cb-btn"><i class="ti ti-edit" aria-hidden="true"></i> Edit</button>
+                  <button class="cb-btn"><i class="ti ti-user-plus" aria-hidden="true"></i> Assign owner</button>
+                  <button class="cb-btn push"><i class="ti ti-arrow-right" aria-hidden="true"></i> Push level</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="c-conn"><div class="c-conn-line"></div></div>
+
+          <div class="c-node">
+            <div class="c-card lc-3" id="n-3" onclick="toggleNode('n-3')">
+              <div class="c-summary">
+                <span class="cs-level cl-3">Rules</span>
+                <span class="cs-kpi">Procurement policies updated · BOD costs ≤ 1.5% of operations</span>
+                <span class="cs-owner">Head Procurement</span>
+                <i class="ti ti-chevron-down cs-chev" aria-hidden="true"></i>
+              </div>
+              <div class="c-body">
+                <div class="cb-kpi">100% policies updated · BOD cost ratio ≤ 1.5%</div>
+                <div class="cb-target">Governance framework aligned to Public Procurement Act and cost-control mandate — enforced through quarterly audits.</div>
+                <div class="cb-meta">
+                  <div class="cbm-item"><div class="cbm-label">Owner</div><div class="cbm-val">Head Procurement</div></div>
+                  <div class="cbm-item"><div class="cbm-label">Frequency</div><div class="cbm-val">Quarterly audit</div></div>
+                  <div class="cbm-item"><div class="cbm-label">Evidence</div><div class="cbm-val">Policy docs · Audit reports</div></div>
+                </div>
+                <div class="cb-tasks-label">Actions at this level</div>
+                <div class="cb-tasks">
+                  <div class="cb-task"><div class="cb-dot" style="background:#D97706"></div>Review all procurement policies against Public Procurement Act — March</div>
+                  <div class="cb-task"><div class="cb-dot" style="background:#D97706"></div>Annual plan uploaded to ZPPA EGP platform — January 25</div>
+                  <div class="cb-task"><div class="cb-dot" style="background:#D97706"></div>100% of contracts disclosed on EGP platform throughout the year</div>
+                </div>
+                <div class="cb-actions">
+                  <button class="cb-btn"><i class="ti ti-edit" aria-hidden="true"></i> Edit</button>
+                  <button class="cb-btn"><i class="ti ti-user-plus" aria-hidden="true"></i> Assign owner</button>
+                  <button class="cb-btn push"><i class="ti ti-arrow-right" aria-hidden="true"></i> Push level</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="c-conn"><div class="c-conn-line"></div></div>
+
+          <div class="c-node">
+            <div class="c-card lc-4" id="n-4" onclick="toggleNode('n-4')">
+              <div class="c-summary">
+                <span class="cs-level cl-4">How-to</span>
+                <span class="cs-kpi">Billing SOPs live · MPC minutes to ZPPA within 7 days every time</span>
+                <span class="cs-owner">Ag. MCS / Procurement</span>
+                <i class="ti ti-chevron-down cs-chev" aria-hidden="true"></i>
+              </div>
+              <div class="c-body">
+                <div class="cb-kpi">SOP compliance 100% · MPC minutes submitted within 7 days — every meeting</div>
+                <div class="cb-target">Step-by-step procedures that translate policy into consistent daily execution across all billing and procurement functions.</div>
+                <div class="cb-meta">
+                  <div class="cbm-item"><div class="cbm-label">Owner</div><div class="cbm-val">Ag. MCS / Procurement</div></div>
+                  <div class="cbm-item"><div class="cbm-label">Frequency</div><div class="cbm-val">Per billing cycle</div></div>
+                  <div class="cbm-item"><div class="cbm-label">Evidence</div><div class="cbm-val">Logs · ZPPA cover letter</div></div>
+                </div>
+                <div class="cb-tasks-label">Actions at this level</div>
+                <div class="cb-tasks">
+                  <div class="cb-task"><div class="cb-dot" style="background:#7C3AED"></div>Billing SOPs revised, approved and operationalised — March 2026</div>
+                  <div class="cb-task"><div class="cb-dot" style="background:#7C3AED"></div>MPC meeting minutes submitted to ZPPA within 7 days — every single time</div>
+                  <div class="cb-task"><div class="cb-dot" style="background:#7C3AED"></div>Meter Management Policy operationalised with enforcement — March</div>
+                </div>
+                <div class="cb-actions">
+                  <button class="cb-btn"><i class="ti ti-edit" aria-hidden="true"></i> Edit</button>
+                  <button class="cb-btn"><i class="ti ti-user-plus" aria-hidden="true"></i> Assign owner</button>
+                  <button class="cb-btn push"><i class="ti ti-arrow-right" aria-hidden="true"></i> Push level</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="c-conn"><div class="c-conn-line"></div></div>
+
+          <div class="c-node">
+            <div class="c-card lc-5" id="n-5" onclick="toggleNode('n-5')">
+              <div class="c-summary">
+                <span class="cs-level cl-5">Habits</span>
+                <span class="cs-kpi">Staff self-initiate compliance · Leave planned without prompting</span>
+                <span class="cs-owner">All staff</span>
+                <i class="ti ti-chevron-down cs-chev" aria-hidden="true"></i>
+              </div>
+              <div class="c-body">
+                <div class="cb-kpi">100% trained by March · Zero excess leave accumulation by December</div>
+                <div class="cb-target">Daily behaviours embedded so deeply they happen without instruction — the cultural floor of operational discipline.</div>
+                <div class="cb-meta">
+                  <div class="cbm-item"><div class="cbm-label">Owner</div><div class="cbm-val">All staff / supervisors</div></div>
+                  <div class="cbm-item"><div class="cbm-label">Frequency</div><div class="cbm-val">Monthly 1-on-1</div></div>
+                  <div class="cbm-item"><div class="cbm-label">Evidence</div><div class="cbm-val">Attendance · Leave records</div></div>
+                </div>
+                <div class="cb-tasks-label">Daily behaviours</div>
+                <div class="cb-tasks">
+                  <div class="cb-task"><div class="cb-dot" style="background:#DC2626"></div>Every staff member attends disciplinary code sensitisation — March, mandatory</div>
+                  <div class="cb-task"><div class="cb-dot" style="background:#DC2626"></div>Email adopted as default for internal communication — habit, no reminder needed</div>
+                  <div class="cb-task"><div class="cb-dot" style="background:#DC2626"></div>Supervisors enforce leave planning — zero accumulation at any point in the year</div>
+                </div>
+                <div class="cb-actions">
+                  <button class="cb-btn"><i class="ti ti-edit" aria-hidden="true"></i> Edit</button>
+                  <button class="cb-btn"><i class="ti ti-user-plus" aria-hidden="true"></i> Assign owner</button>
+                  <button class="cb-btn push"><i class="ti ti-arrow-right" aria-hidden="true"></i> Push level</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- integrity strip -->
+          <div class="integrity-strip">
+            <div class="is-top">
+              <div class="is-title">Cascade integrity check — Goal 1</div>
+              <div class="is-score score-ok">5 / 5 passed</div>
+            </div>
+            <div class="is-track"><div class="is-fill fill-ok" style="width:100%"></div></div>
+            <div class="is-checks">
+              <div class="is-check"><i class="ti ti-circle-check ic-ok" aria-hidden="true"></i>Traces to strategic mandate</div>
+              <div class="is-check"><i class="ti ti-circle-check ic-ok" aria-hidden="true"></i>Owner at every level</div>
+              <div class="is-check"><i class="ti ti-circle-check ic-ok" aria-hidden="true"></i>Individual tasks are actionable</div>
+              <div class="is-check"><i class="ti ti-circle-check ic-ok" aria-hidden="true"></i>Policy enables procedure</div>
+              <div class="is-check"><i class="ti ti-circle-check ic-ok" aria-hidden="true"></i>Practices KPI is measurable</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ GOAL 1 — DEPT ══ -->
+        <div id="v-g0-dept" class="view-panel dept-grid" style="display:none">
+          <div class="dept-card">
+            <div class="dc-dept">Finance</div>
+            <div class="dc-kpi">Cost recovery ≥ 100% · Audited accounts by Feb 23</div>
+            <ul class="dc-tasks">
+              <li>Monthly cash flow vs budget review</li>
+              <li>2025 financial statements submitted Feb 20</li>
+              <li>Variance reports to SMT monthly</li>
+            </ul>
+          </div>
+          <div class="dept-card">
+            <div class="dc-dept">Commercial / MCS</div>
+            <div class="dc-kpi">Billing efficiency ≥ 85% · 1,800 meters replaced</div>
+            <ul class="dc-tasks">
+              <li>Monthly commercial reports to SMT</li>
+              <li>Zero-consumption accounts down 15%</li>
+              <li>Database clean-up by June</li>
+            </ul>
+          </div>
+          <div class="dept-card">
+            <div class="dc-dept">HR · MHRA</div>
+            <div class="dc-kpi">Staff efficiency index improved · Organogram by Dec</div>
+            <ul class="dc-tasks">
+              <li>Multi-skilling plan by June</li>
+              <li>All JDs updated by June</li>
+              <li>Strategic recruitments for critical roles</li>
+            </ul>
+          </div>
+          <div class="dept-card">
+            <div class="dc-dept">Procurement</div>
+            <div class="dc-kpi">100% policies updated · Plan on ZPPA EGP by Jan 25</div>
+            <ul class="dc-tasks">
+              <li>3 framework agreements by July</li>
+              <li>Contract management register maintained</li>
+              <li>Market surveys for commonly procured items</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ══ GOAL 1 — INDIVIDUAL ══ -->
+        <div id="v-g0-ind" class="view-panel ind-wrap" style="display:none">
+          <div class="ind-role">
+            <i class="ti ti-user" aria-hidden="true"></i>
+            Meter Reader / Commercial Officer · Commercial Department
+          </div>
+          <div class="ind-list">
+            <div class="ind-card">
+              <div class="ind-top">
+                <span class="ind-badge" style="background:#EDE9FE;color:#5B21B6">Daily</span>
+                <div class="ind-name">Complete meter reading route per SOP — no estimated reads</div>
+                <span class="ind-freq">Every shift</span>
+              </div>
+              <ul class="ind-tasks">
+                <li>Upload readings same day via app — no backlogs tolerated</li>
+                <li>Flag zero-consumption or spike readings within 2 hours of detection</li>
+              </ul>
+            </div>
+            <div class="ind-card">
+              <div class="ind-top">
+                <span class="ind-badge" style="background:#FEF3C7;color:#92400E">Ongoing</span>
+                <div class="ind-name">All billing queries resolved within 3 working days</div>
+                <span class="ind-freq">Per complaint</span>
+              </div>
+              <ul class="ind-tasks">
+                <li>Log every complaint in CRM on day of receipt — timestamp is the record</li>
+                <li>Escalate unresolved queries at Day 2 — do not wait for Day 3</li>
+              </ul>
+            </div>
+            <div class="ind-card">
+              <div class="ind-top">
+                <span class="ind-badge" style="background:#FEE2E2;color:#991B1B">Monthly</span>
+                <div class="ind-name">Proactively check zero-consumption accounts on route</div>
+                <span class="ind-freq">Self-initiated</span>
+              </div>
+              <ul class="ind-tasks">
+                <li>Check ≥5 zero-consumption accounts per route cycle — unprompted</li>
+                <li>Report suspected illegal connections same shift via CMMS</li>
+              </ul>
+            </div>
+          </div>
+          <div class="los">
+            <div class="los-top">
+              <div class="los-label">Your work connects to the corporate goal</div>
+              <div class="los-val">Full trace confirmed</div>
+            </div>
+            <div class="los-track"><div class="los-fill" style="width:100%"></div></div>
+            <div class="los-checks">
+              <div class="los-check"><i class="ti ti-circle-check" aria-hidden="true"></i>Readings → billing accuracy</div>
+              <div class="los-check"><i class="ti ti-circle-check" aria-hidden="true"></i>Billing → collection rate</div>
+              <div class="los-check"><i class="ti ti-circle-check" aria-hidden="true"></i>Collection → cost recovery</div>
+              <div class="los-check"><i class="ti ti-circle-check" aria-hidden="true"></i>Recovery → sustainability</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Goals 2-4 placeholder panels -->
+        <div id="v-g1-chain" class="view-panel" style="display:none">
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:10px;padding:32px;text-align:center;max-width:640px">
+            <i class="ti ti-git-branch" style="font-size:32px;color:var(--text-muted);display:block;margin-bottom:12px" aria-hidden="true"></i>
+            <div style="font-size:.9rem;font-weight:600;color:var(--text-primary);margin-bottom:4px">Goal 2 — Reliable water supply</div>
+            <div style="font-size:.82rem;color:var(--text-muted)">Cascade ready · 1 integrity flag · DMA baseline needed before NRW target is set</div>
+          </div>
+        </div>
+        <div id="v-g1-dept" class="view-panel" style="display:none"></div>
+        <div id="v-g1-ind"   class="view-panel" style="display:none"></div>
+
+        <div id="v-g2-chain" class="view-panel" style="display:none">
+          <div style="background:var(--white);border:1px solid var(--border);border-left:3px solid var(--warn);border-radius:10px;padding:32px;text-align:center;max-width:640px">
+            <i class="ti ti-alert-triangle" style="font-size:32px;color:var(--warn);display:block;margin-bottom:12px" aria-hidden="true"></i>
+            <div style="font-size:.9rem;font-weight:600;color:var(--text-primary);margin-bottom:4px">Goal 3 — Sanitation access · 2 flags</div>
+            <div style="font-size:.82rem;color:var(--text-muted)">Sanitation coverage baseline not yet collected · Practices KPI needs a measurement method before this cascade is usable</div>
+          </div>
+        </div>
+        <div id="v-g2-dept" class="view-panel" style="display:none"></div>
+        <div id="v-g2-ind"   class="view-panel" style="display:none"></div>
+
+        <div id="v-g3-chain" class="view-panel" style="display:none">
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:10px;padding:32px;text-align:center;max-width:640px">
+            <i class="ti ti-git-branch" style="font-size:32px;color:var(--text-muted);display:block;margin-bottom:12px" aria-hidden="true"></i>
+            <div style="font-size:.9rem;font-weight:600;color:var(--text-primary);margin-bottom:4px">Goal 4 — Customer service</div>
+            <div style="font-size:.82rem;color:var(--text-muted)">Cascade ready · 1 flag · CRM system not live until February — complaint SLA unenforceable until then</div>
+          </div>
+        </div>
+        <div id="v-g3-dept" class="view-panel" style="display:none"></div>
+        <div id="v-g3-ind"   class="view-panel" style="display:none"></div>
+
+      </div><!-- main-scroll -->
+    </main>
+  </div><!-- content-area -->
+</div><!-- app-shell -->
+
+<!-- EXPORT PANEL -->
+<div class="export-overlay" id="export-overlay" onclick="closeExportIfOutside(event)">
+  <div class="export-panel" role="dialog" aria-modal="true" aria-label="Export options">
+    <div class="ep-header">
+      <div class="ep-title">Export cascade</div>
+      <button class="ep-close" onclick="closeExport()" aria-label="Close export panel">
+        <i class="ti ti-x" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="export-opts">
+      <div class="export-opt" onclick="closeExport()">
+        <div class="eo-icon"><i class="ti ti-file-type-pdf" aria-hidden="true"></i></div>
+        <div>
+          <div class="eo-label">Export as PDF</div>
+          <div class="eo-sub">Full cascade report — all goals, all views, integrity checks</div>
+        </div>
+      </div>
+      <div class="export-opt" onclick="closeExport()">
+        <div class="eo-icon"><i class="ti ti-table-export" aria-hidden="true"></i></div>
+        <div>
+          <div class="eo-label">Export as Excel</div>
+          <div class="eo-sub">Structured spreadsheet — one sheet per goal, KPIs and owners editable</div>
+        </div>
+      </div>
+      <div class="export-opt" onclick="closeExport()">
+        <div class="eo-icon"><i class="ti ti-file-type-docx" aria-hidden="true"></i></div>
+        <div>
+          <div class="eo-label">Export as Word</div>
+          <div class="eo-sub">Performance contract template — individual view, ready to sign</div>
+        </div>
+      </div>
+      <div class="export-opt" onclick="closeExport()">
+        <div class="eo-icon"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+        <div>
+          <div class="eo-label">Push to Karis Performance</div>
+          <div class="eo-sub">Send the full cascade directly into the performance management module</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ════════════════════════════
+     GOAL & VIEW STATE
+  ════════════════════════════ */
+  let curGoal = 0;
+  let curView = 'chain';
+
+  const goalMeta = [
+    {
+      eyebrow: 'Corporate goal · LpWSC FY-2026',
+      title:   'Enhance financial sustainability and operational efficiency',
+      meta:    '<span class="meta-pill"><i class="ti ti-currency-dollar"></i>ZMW 13,599,400</span><span class="meta-pill"><i class="ti ti-user"></i>Director of Finance</span>',
+      hint:    '6 delivery levels · tap any row to expand'
+    },
+    {
+      eyebrow: 'Corporate goal · LpWSC FY-2026',
+      title:   'Provide reliable and equitable water supply across the province',
+      meta:    '<span class="meta-pill"><i class="ti ti-currency-dollar"></i>ZMW 27,055,000</span><span class="meta-pill"><i class="ti ti-user"></i>Technical Services / DOTS</span>',
+      hint:    '6 delivery levels · 1 integrity flag'
+    },
+    {
+      eyebrow: 'Corporate goal · LpWSC FY-2026',
+      title:   'Improve access to safe, adequate and sustainable sanitation services',
+      meta:    '<span class="meta-pill"><i class="ti ti-currency-dollar"></i>ZMW 1,740,000</span><span class="meta-pill"><i class="ti ti-user"></i>Technical Services / Ag. MCS</span>',
+      hint:    '6 delivery levels · 2 integrity flags'
+    },
+    {
+      eyebrow: 'Corporate goal · LpWSC FY-2026',
+      title:   'Deliver excellent customer service and strengthen stakeholder engagement',
+      meta:    '<span class="meta-pill"><i class="ti ti-user"></i>HPR&M / Ag. MCS</span>',
+      hint:    '6 delivery levels · 1 integrity flag'
+    }
+  ];
+
+  function setGoal(n, el) {
+    curGoal = n;
+    document.querySelectorAll('.g-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    const m = goalMeta[n];
+    document.getElementById('tb-eyebrow').textContent = m.eyebrow;
+    document.getElementById('tb-title').textContent   = m.title;
+    document.getElementById('tb-meta').innerHTML      = m.meta;
+    document.getElementById('vbar-hint').textContent  = m.hint;
+    showPanel();
+  }
+
+  function setView(v, el) {
+    curView = v;
+    document.querySelectorAll('.vbar-tab').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    /* sync rail buttons */
+    document.querySelectorAll('.vt-btn').forEach(b => {
+      b.classList.toggle('active',
+        (v === 'chain' && b.id === 'vt-chain') ||
+        (v === 'dept'  && b.id === 'vt-dept')  ||
+        (v === 'ind'   && b.id === 'vt-ind')
+      );
+    });
+    showPanel();
+  }
+
+  function setViewRail(v, el) {
+    curView = v;
+    document.querySelectorAll('.vt-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.vbar-tab').forEach(b => {
+      b.classList.toggle('active',
+        (v === 'chain' && b.textContent === 'Cascade') ||
+        (v === 'dept'  && b.textContent === 'By department') ||
+        (v === 'ind'   && b.textContent === 'My contract')
+      );
+    });
+    showPanel();
+  }
+
+  function showPanel() {
+    document.querySelectorAll('.view-panel').forEach(p => p.style.display = 'none');
+    const id = 'v-g' + curGoal + '-' + curView;
+    const el = document.getElementById(id);
+    if (el) el.style.display = curView === 'dept' ? 'grid' : 'block';
+  }
+
+  /* ════════════════════════════
+     NODE EXPAND / COLLAPSE
+  ════════════════════════════ */
+  function toggleNode(id) {
+    const card = document.getElementById(id);
+    const isOpen = card.classList.contains('open');
+    /* close all nodes in current chain */
+    document.querySelectorAll('.c-card').forEach(c => c.classList.remove('open'));
+    if (!isOpen) card.classList.add('open');
+  }
+
+  /* ════════════════════════════
+     EXPORT PANEL
+  ════════════════════════════ */
+  function openExport()  { document.getElementById('export-overlay').classList.add('open'); }
+  function closeExport() { document.getElementById('export-overlay').classList.remove('open'); }
+  function closeExportIfOutside(e) {
+    if (e.target === document.getElementById('export-overlay')) closeExport();
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeExport(); });
+</script>
+
+</body>
+</html>

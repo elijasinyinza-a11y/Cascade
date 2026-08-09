@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sessions — Karis Cascade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="../assets/css/karis-cascade.css" />
+  <style>
+    body { background: var(--page-bg); }
+
+    .app-layout {
+      display: grid;
+      grid-template-rows: 52px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── PAGE BODY ── */
+    .page-body {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      width: 100%;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 16px;
+      margin-bottom: 32px;
+    }
+    .ph-left {}
+    .ph-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem; color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .ph-sub { font-size: .875rem; color: var(--text-muted); }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .search-wrap {
+      position: relative; flex: 1; min-width: 200px;
+    }
+    .search-icon {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px; color: var(--text-muted);
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%; height: 38px;
+      padding: 0 14px 0 38px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif; font-size: .875rem;
+      color: var(--text-primary); background: var(--white);
+      outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    .search-input:focus {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px var(--violet-light);
+    }
+    .filter-select {
+      height: 38px; padding: 0 32px 0 12px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif; font-size: .82rem;
+      color: var(--text-secondary); background: var(--white);
+      outline: none; appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+      transition: border-color .15s;
+    }
+    .filter-select:focus { border-color: var(--violet); }
+
+    /* ── STATS STRIP ── */
+    .stats-strip {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 10px; margin-bottom: 24px;
+    }
+    .stat-cell {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 14px 16px;
+    }
+    .stat-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem; color: var(--text-primary);
+      line-height: 1; margin-bottom: 3px;
+    }
+    .stat-label { font-size: .75rem; color: var(--text-muted); }
+
+    /* ── SESSION LIST ── */
+    .session-list {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .session-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-md); overflow: hidden;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .session-card:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sc-main {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 18px; cursor: pointer;
+    }
+
+    /* left accent bar */
+    .sc-bar {
+      width: 3px; height: 40px; border-radius: 99px;
+      flex-shrink: 0;
+    }
+    .bar-ok   { background: var(--teal); }
+    .bar-warn { background: var(--warn); }
+    .bar-draft{ background: var(--border-strong); }
+
+    .sc-body { flex: 1; min-width: 0; }
+    .sc-org {
+      font-size: .72rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 3px;
+    }
+    .sc-title {
+      font-size: .9rem; font-weight: 600; color: var(--text-primary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+    .sc-meta {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .sc-tag {
+      font-size: .68rem; font-weight: 600; padding: 2px 8px;
+      border-radius: 99px; white-space: nowrap;
+    }
+    .tag-ok   { background: var(--teal-light);   color: var(--teal-dark); }
+    .tag-warn { background: #FFFBEB; color: #92400E; }
+    .tag-draft{ background: var(--page-bg); color: var(--text-muted); border: 1px solid var(--border); }
+    .sc-date  { font-size: .72rem; color: var(--text-muted); }
+    .sc-goals { font-size: .72rem; color: var(--text-muted); }
+
+    /* right side actions */
+    .sc-right {
+      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    }
+    .sc-score {
+      text-align: right;
+    }
+    .sc-score-num {
+      font-size: .8rem; font-weight: 700;
+      display: block; margin-bottom: 1px;
+    }
+    .sc-score-label { font-size: .65rem; color: var(--text-muted); }
+    .sc-actions { display: flex; gap: 4px; }
+    .sc-action-btn {
+      width: 32px; height: 32px; border-radius: 7px;
+      border: 1px solid var(--border); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; color: var(--text-muted); cursor: pointer;
+      transition: all .15s;
+    }
+    .sc-action-btn:hover { background: var(--page-bg); color: var(--text-secondary); border-color: var(--border-strong); }
+    .sc-action-btn.open-btn {
+      background: var(--violet); border-color: var(--violet); color: #fff;
+    }
+    .sc-action-btn.open-btn:hover { background: var(--violet-mid); }
+
+    /* expanded goal chips */
+    .sc-expanded {
+      display: none;
+      padding: 0 18px 14px 18px;
+      border-top: 1px solid var(--border);
+      background: var(--page-bg);
+    }
+    .sc-expanded.open { display: block; }
+    .sc-goals-label {
+      font-size: .65rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--text-muted);
+      padding: 10px 0 8px;
+    }
+    .goal-chips {
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .goal-chip {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 7px; padding: 8px 12px;
+      font-size: .8rem; color: var(--text-secondary);
+    }
+    .gc-dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .gc-text { flex: 1; }
+    .gc-integrity {
+      font-size: .68rem; font-weight: 700; flex-shrink: 0;
+    }
+    .int-ok   { color: var(--teal); }
+    .int-warn { color: var(--warn); }
+
+    .sc-expanded-actions {
+      display: flex; gap: 6px; margin-top: 12px;
+    }
+    .sea-btn {
+      padding: 6px 14px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--white);
+      font-family: 'Inter', sans-serif; font-size: .78rem;
+      font-weight: 500; color: var(--text-secondary); cursor: pointer;
+      display: flex; align-items: center; gap: 5px; transition: all .15s;
+    }
+    .sea-btn:hover { border-color: var(--border-strong); background: var(--white); }
+    .sea-btn.primary {
+      background: var(--violet); color: #fff; border-color: var(--violet);
+    }
+    .sea-btn.primary:hover { background: var(--violet-mid); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      display: none;
+      text-align: center; padding: 60px 24px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+    }
+    .empty-state.show { display: block; }
+    .es-icon {
+      font-size: 40px; color: var(--text-muted);
+      margin-bottom: 16px; display: block;
+    }
+    .es-title { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+    .es-sub   { font-size: .875rem; color: var(--text-muted); margin-bottom: 20px; }
+
+    /* ── PLAN GATE (free tier notice) ── */
+    .plan-gate {
+      background: var(--navy); border-radius: var(--radius-md);
+      padding: 18px 20px; display: flex; align-items: center;
+      gap: 16px; margin-top: 24px;
+    }
+    .pg-icon {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: rgba(124,92,191,.25); display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .pg-icon i { font-size: 20px; color: #C4B0E8; }
+    .pg-body { flex: 1; }
+    .pg-title { font-size: .875rem; font-weight: 600; color: #fff; margin-bottom: 2px; }
+    .pg-sub   { font-size: .78rem; color: rgba(255,255,255,.45); }
+    .pg-btn {
+      padding: 8px 18px; border-radius: 6px;
+      background: var(--violet); color: #fff; border: none;
+      font-family: 'Inter', sans-serif; font-size: .82rem;
+      font-weight: 600; cursor: pointer; white-space: nowrap;
+      transition: background .15s; flex-shrink: 0;
+    }
+    .pg-btn:hover { background: var(--violet-mid); }
+
+    /* ── DELETE CONFIRM ── */
+    .confirm-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    .confirm-overlay.open { display: flex; }
+    .confirm-modal {
+      background: var(--white); border-radius: var(--radius-lg);
+      padding: 28px; width: 100%; max-width: 380px;
+      box-shadow: var(--shadow-lg);
+    }
+    .cm-title { font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+    .cm-sub   { font-size: .85rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+    .cm-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .cm-cancel {
+      padding: 9px 18px; border-radius: 6px;
+      border: 1px solid var(--border); background: transparent;
+      font-family: 'Inter', sans-serif; font-size: .85rem;
+      font-weight: 500; color: var(--text-secondary); cursor: pointer;
+    }
+    .cm-cancel:hover { background: var(--page-bg); }
+    .cm-delete {
+      padding: 9px 18px; border-radius: 6px;
+      background: #EF4444; color: #fff; border: none;
+      font-family: 'Inter', sans-serif; font-size: .85rem;
+      font-weight: 600; cursor: pointer;
+    }
+    .cm-delete:hover { background: #DC2626; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .stats-strip { grid-template-columns: 1fr 1fr; }
+      .page-header { flex-direction: column; gap: 12px; }
+    }
+    @media (max-width: 480px) {
+      .stats-strip { grid-template-columns: 1fr 1fr; }
+      .sc-score { display: none; }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .filter-select { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+  <!-- APP NAV -->
+  <nav class="app-nav" role="navigation" aria-label="Cascade app navigation">
+    <div class="app-nav-left">
+      <a href="https://karismind.com" class="back-link">
+        <i class="ti ti-arrow-left" style="font-size:12px"></i>Karis Mind
+      </a>
+      <span class="nav-sep">›</span>
+      <span class="nav-product">
+        <span class="nav-product-dot"></span>Cascade
+      </span>
+    </div>
+    <div class="app-nav-right">
+      <a href="sessions.html" class="nav-link" style="color:#fff;font-weight:600">Sessions</a>
+      <a href="settings.html" class="nav-link">Account</a>
+      <div class="nav-avatar" title="Your account">BM</div>
+    </div>
+  </nav>
+
+  <!-- PAGE BODY -->
+  <div class="page-body">
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div class="ph-left">
+        <h1 class="ph-title">Sessions</h1>
+        <p class="ph-sub">Your saved cascade sessions. Pick up where you left off or start a new one.</p>
+      </div>
+      <a href="index.html" class="btn btn-violet btn-sm">
+        <i class="ti ti-plus" aria-hidden="true"></i> New cascade
+      </a>
+    </div>
+
+    <!-- STATS STRIP -->
+    <div class="stats-strip" role="region" aria-label="Session statistics">
+      <div class="stat-cell">
+        <div class="stat-num">6</div>
+        <div class="stat-label">Total sessions</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num">18</div>
+        <div class="stat-label">Goals cascaded</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" style="color:var(--teal)">4</div>
+        <div class="stat-label">Fully clean</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" style="color:var(--warn)">2</div>
+        <div class="stat-label">Flags to resolve</div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar" role="search" aria-label="Filter sessions">
+      <div class="search-wrap">
+        <i class="ti ti-search search-icon" aria-hidden="true"></i>
+        <input
+          class="search-input"
+          type="search"
+          placeholder="Search sessions…"
+          oninput="filterSessions(this.value)"
+          aria-label="Search sessions"
+        />
+      </div>
+      <select class="filter-select" onchange="filterByStatus(this.value)" aria-label="Filter by status">
+        <option value="all">All statuses</option>
+        <option value="ok">Clean</option>
+        <option value="warn">Flagged</option>
+        <option value="draft">Draft</option>
+      </select>
+      <select class="filter-select" onchange="filterByOrg(this.value)" aria-label="Filter by organisation">
+        <option value="all">All organisations</option>
+        <option value="lpwsc">LpWSC</option>
+        <option value="ore">Ore Corp Mining</option>
+        <option value="personal">Personal</option>
+      </select>
+    </div>
+
+    <!-- SESSION LIST -->
+    <div class="session-list" id="session-list" role="list" aria-label="Cascade sessions">
+
+      <!-- SESSION 1 -->
+      <div class="session-card" data-status="ok" data-org="lpwsc" data-search="lpwsc luapula water financial water supply sanitation customer" role="listitem">
+        <div class="sc-main" onclick="toggleExpand('s1')">
+          <div class="sc-bar bar-ok"></div>
+          <div class="sc-body">
+            <div class="sc-org">Luapula Water &amp; Sanitation Co.</div>
+            <div class="sc-title">LpWSC FY-2026 Annual Workplan</div>
+            <div class="sc-meta">
+              <span class="sc-tag tag-ok">
+                <i class="ti ti-circle-check" style="font-size:11px;vertical-align:middle;margin-right:2px" aria-hidden="true"></i>4/4 clean
+              </span>
+              <span class="sc-date">
+                <i class="ti ti-calendar" style="font-size:11px;vertical-align:middle" aria-hidden="true"></i>
+                Today, 09:14
+              </span>
+              <span class="sc-goals">4 goals · Annual workplan</span>
+            </div>
+          </div>
+          <div class="sc-right">
+            <div class="sc-score">
+              <span class="sc-score-num score-ok">16/20</span>
+              <span class="sc-score-label">integrity pts</span>
+            </div>
+            <div class="sc-actions">
+              <button class="sc-action-btn" title="Export" onclick="event.stopPropagation();exportSession('s1')">
+                <i class="ti ti-download" aria-hidden="true"></i>
+              </button>
+              <button class="sc-action-btn" title="Delete" onclick="event.stopPropagation();confirmDelete('s1')">
+                <i class="ti ti-trash" aria-hidden="true"></i>
+              </button>
+              <a href="output.html" class="sc-action-btn open-btn" title="Open session" onclick="event.stopPropagation()">
+                <i class="ti ti-arrow-right" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="sc-expanded" id="s1">
+          <div class="sc-goals-label">Goals in this session</div>
+          <div class="goal-chips">
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--teal)"></div>
+              <span class="gc-text">Enhance financial sustainability and operational efficiency</span>
+              <span class="gc-integrity int-ok">5/5</span>
+            </div>
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--warn)"></div>
+              <span class="gc-text">Provide reliable and equitable water supply</span>
+              <span class="gc-integrity int-warn">4/5</span>
+            </div>
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--warn)"></div>
+              <span class="gc-text">Improve access to safe and sustainable sanitation services</span>
+              <span class="gc-integrity int-warn">3/5</span>
+            </div>
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--teal)"></div>
+              <span class="gc-text">Deliver excellent customer service and stakeholder engagement</span>
+              <span class="gc-integrity int-ok">4/5</span>
+            </div>
+          </div>
+          <div class="sc-expanded-actions">
+            <button class="sea-btn"><i class="ti ti-download" aria-hidden="true"></i> Export</button>
+            <button class="sea-btn"><i class="ti ti-copy" aria-hidden="true"></i> Duplicate</button>
+            <a href="output.html" class="sea-btn primary">
+              <i class="ti ti-arrow-right" aria-hidden="true"></i> Open session
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESSION 2 -->
+      <div class="session-card" data-status="ok" data-org="ore" data-search="ore corp mining throughput safety equipment" role="listitem">
+        <div class="sc-main" onclick="toggleExpand('s2')">
+          <div class="sc-bar bar-ok"></div>
+          <div class="sc-body">
+            <div class="sc-org">Ore Corp Mining</div>
+            <div class="sc-title">Processing Plant — Throughput Goals FY-2026</div>
+            <div class="sc-meta">
+              <span class="sc-tag tag-ok">
+                <i class="ti ti-circle-check" style="font-size:11px;vertical-align:middle;margin-right:2px" aria-hidden="true"></i>Clean
+              </span>
+              <span class="sc-date">
+                <i class="ti ti-calendar" style="font-size:11px;vertical-align:middle" aria-hidden="true"></i>
+                Yesterday
+              </span>
+              <span class="sc-goals">2 goals · Typed manually</span>
+            </div>
+          </div>
+          <div class="sc-right">
+            <div class="sc-score">
+              <span class="sc-score-num score-ok">10/10</span>
+              <span class="sc-score-label">integrity pts</span>
+            </div>
+            <div class="sc-actions">
+              <button class="sc-action-btn" title="Export" onclick="event.stopPropagation();exportSession('s2')">
+                <i class="ti ti-download" aria-hidden="true"></i>
+              </button>
+              <button class="sc-action-btn" title="Delete" onclick="event.stopPropagation();confirmDelete('s2')">
+                <i class="ti ti-trash" aria-hidden="true"></i>
+              </button>
+              <button class="sc-action-btn open-btn" title="Open session" onclick="event.stopPropagation()">
+                <i class="ti ti-arrow-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="sc-expanded" id="s2">
+          <div class="sc-goals-label">Goals in this session</div>
+          <div class="goal-chips">
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--teal)"></div>
+              <span class="gc-text">Increase ore processing throughput by 12%</span>
+              <span class="gc-integrity int-ok">5/5</span>
+            </div>
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--teal)"></div>
+              <span class="gc-text">Reduce lost-time injuries to zero by Q3</span>
+              <span class="gc-integrity int-ok">5/5</span>
+            </div>
+          </div>
+          <div class="sc-expanded-actions">
+            <button class="sea-btn"><i class="ti ti-download" aria-hidden="true"></i> Export</button>
+            <button class="sea-btn"><i class="ti ti-copy" aria-hidden="true"></i> Duplicate</button>
+            <button class="sea-btn primary">
+              <i class="ti ti-arrow-right" aria-hidden="true"></i> Open session
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESSION 3 -->
+      <div class="session-card" data-status="warn" data-org="lpwsc" data-search="lpwsc luapula water capital projects infrastructure" role="listitem">
+        <div class="sc-main" onclick="toggleExpand('s3')">
+          <div class="sc-bar bar-warn"></div>
+          <div class="sc-body">
+            <div class="sc-org">Luapula Water &amp; Sanitation Co.</div>
+            <div class="sc-title">Capital Projects Review — Q2 2026</div>
+            <div class="sc-meta">
+              <span class="sc-tag tag-warn">
+                <i class="ti ti-alert-circle" style="font-size:11px;vertical-align:middle;margin-right:2px" aria-hidden="true"></i>2 flags
+              </span>
+              <span class="sc-date">
+                <i class="ti ti-calendar" style="font-size:11px;vertical-align:middle" aria-hidden="true"></i>
+                3 days ago
+              </span>
+              <span class="sc-goals">3 goals · Workplan upload</span>
+            </div>
+          </div>
+          <div class="sc-right">
+            <div class="sc-score">
+              <span class="sc-score-num score-warn">13/15</span>
+              <span class="sc-score-label">integrity pts</span>
+            </div>
+            <div class="sc-actions">
+              <button class="sc-action-btn" title="Export" onclick="event.stopPropagation();exportSession('s3')">
+                <i class="ti ti-download" aria-hidden="true"></i>
+              </button>
+              <button class="sc-action-btn" title="Delete" onclick="event.stopPropagation();confirmDelete('s3')">
+                <i class="ti ti-trash" aria-hidden="true"></i>
+              </button>
+              <button class="sc-action-btn open-btn" title="Open session" onclick="event.stopPropagation()">
+                <i class="ti ti-arrow-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="sc-expanded" id="s3">
+          <div class="sc-goals-label">Goals in this session</div>
+          <div class="goal-chips">
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--teal)"></div>
+              <span class="gc-text">Complete 5km network extension per district</span>
+              <span class="gc-integrity int-ok">5/5</span>
+            </div>
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--warn)"></div>
+              <span class="gc-text">Establish 5 District Metered Areas by March</span>
+              <span class="gc-integrity int-warn">4/5</span>
+            </div>
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--warn)"></div>
+              <span class="gc-text">Construct 2 faecal sludge treatment plants</span>
+              <span class="gc-integrity int-warn">4/5</span>
+            </div>
+          </div>
+          <div class="sc-expanded-actions">
+            <button class="sea-btn"><i class="ti ti-download" aria-hidden="true"></i> Export</button>
+            <button class="sea-btn"><i class="ti ti-copy" aria-hidden="true"></i> Duplicate</button>
+            <button class="sea-btn primary">
+              <i class="ti ti-arrow-right" aria-hidden="true"></i> Open session
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESSION 4 -->
+      <div class="session-card" data-status="ok" data-org="personal" data-search="personal hr talent performance review" role="listitem">
+        <div class="sc-main" onclick="toggleExpand('s4')">
+          <div class="sc-bar bar-ok"></div>
+          <div class="sc-body">
+            <div class="sc-org">Personal</div>
+            <div class="sc-title">HR Department — FY-2026 Performance Goals</div>
+            <div class="sc-meta">
+              <span class="sc-tag tag-ok">
+                <i class="ti ti-circle-check" style="font-size:11px;vertical-align:middle;margin-right:2px" aria-hidden="true"></i>Clean
+              </span>
+              <span class="sc-date">
+                <i class="ti ti-calendar" style="font-size:11px;vertical-align:middle" aria-hidden="true"></i>
+                1 week ago
+              </span>
+              <span class="sc-goals">1 goal · Typed manually</span>
+            </div>
+          </div>
+          <div class="sc-right">
+            <div class="sc-score">
+              <span class="sc-score-num score-ok">5/5</span>
+              <span class="sc-score-label">integrity pts</span>
+            </div>
+            <div class="sc-actions">
+              <button class="sc-action-btn" title="Export" onclick="event.stopPropagation();exportSession('s4')">
+                <i class="ti ti-download" aria-hidden="true"></i>
+              </button>
+              <button class="sc-action-btn" title="Delete" onclick="event.stopPropagation();confirmDelete('s4')">
+                <i class="ti ti-trash" aria-hidden="true"></i>
+              </button>
+              <button class="sc-action-btn open-btn" title="Open session" onclick="event.stopPropagation()">
+                <i class="ti ti-arrow-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="sc-expanded" id="s4">
+          <div class="sc-goals-label">Goals in this session</div>
+          <div class="goal-chips">
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--teal)"></div>
+              <span class="gc-text">Reduce staff turnover rate from 22% to below 12% by December</span>
+              <span class="gc-integrity int-ok">5/5</span>
+            </div>
+          </div>
+          <div class="sc-expanded-actions">
+            <button class="sea-btn"><i class="ti ti-download" aria-hidden="true"></i> Export</button>
+            <button class="sea-btn"><i class="ti ti-copy" aria-hidden="true"></i> Duplicate</button>
+            <button class="sea-btn primary">
+              <i class="ti ti-arrow-right" aria-hidden="true"></i> Open session
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESSION 5 -->
+      <div class="session-card" data-status="draft" data-org="ore" data-search="ore corp mining environmental sustainability esg" role="listitem">
+        <div class="sc-main" onclick="toggleExpand('s5')">
+          <div class="sc-bar bar-draft"></div>
+          <div class="sc-body">
+            <div class="sc-org">Ore Corp Mining</div>
+            <div class="sc-title">ESG and Sustainability Goals — Draft</div>
+            <div class="sc-meta">
+              <span class="sc-tag tag-draft">Draft</span>
+              <span class="sc-date">
+                <i class="ti ti-calendar" style="font-size:11px;vertical-align:middle" aria-hidden="true"></i>
+                2 weeks ago
+              </span>
+              <span class="sc-goals">2 goals · Strategic plan</span>
+            </div>
+          </div>
+          <div class="sc-right">
+            <div class="sc-score">
+              <span class="sc-score-num" style="color:var(--text-muted)">—</span>
+              <span class="sc-score-label">not generated</span>
+            </div>
+            <div class="sc-actions">
+              <button class="sc-action-btn" title="Delete" onclick="event.stopPropagation();confirmDelete('s5')">
+                <i class="ti ti-trash" aria-hidden="true"></i>
+              </button>
+              <button class="sc-action-btn open-btn" title="Continue draft" onclick="event.stopPropagation();window.location.href='index.html'">
+                <i class="ti ti-edit" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="sc-expanded" id="s5">
+          <div class="sc-goals-label">Goals selected (not yet generated)</div>
+          <div class="goal-chips">
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--border-strong)"></div>
+              <span class="gc-text">Reduce carbon emissions intensity by 18% by 2028</span>
+              <span class="gc-integrity" style="color:var(--text-muted)">—</span>
+            </div>
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--border-strong)"></div>
+              <span class="gc-text">Achieve zero community grievances on environmental impact</span>
+              <span class="gc-integrity" style="color:var(--text-muted)">—</span>
+            </div>
+          </div>
+          <div class="sc-expanded-actions">
+            <button class="sea-btn" onclick="window.location.href='index.html'">
+              <i class="ti ti-edit" aria-hidden="true"></i> Continue draft
+            </button>
+            <button class="sea-btn" onclick="confirmDelete('s5')">
+              <i class="ti ti-trash" aria-hidden="true"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESSION 6 -->
+      <div class="session-card" data-status="ok" data-org="personal" data-search="personal balanced scorecard finance customer internal learning" role="listitem">
+        <div class="sc-main" onclick="toggleExpand('s6')">
+          <div class="sc-bar bar-ok"></div>
+          <div class="sc-body">
+            <div class="sc-org">Personal</div>
+            <div class="sc-title">BSC Cascade — Finance Perspective</div>
+            <div class="sc-meta">
+              <span class="sc-tag tag-ok">
+                <i class="ti ti-circle-check" style="font-size:11px;vertical-align:middle;margin-right:2px" aria-hidden="true"></i>Clean
+              </span>
+              <span class="sc-date">
+                <i class="ti ti-calendar" style="font-size:11px;vertical-align:middle" aria-hidden="true"></i>
+                3 weeks ago
+              </span>
+              <span class="sc-goals">3 goals · Balanced scorecard</span>
+            </div>
+          </div>
+          <div class="sc-right">
+            <div class="sc-score">
+              <span class="sc-score-num score-ok">15/15</span>
+              <span class="sc-score-label">integrity pts</span>
+            </div>
+            <div class="sc-actions">
+              <button class="sc-action-btn" title="Export" onclick="event.stopPropagation();exportSession('s6')">
+                <i class="ti ti-download" aria-hidden="true"></i>
+              </button>
+              <button class="sc-action-btn" title="Delete" onclick="event.stopPropagation();confirmDelete('s6')">
+                <i class="ti ti-trash" aria-hidden="true"></i>
+              </button>
+              <button class="sc-action-btn open-btn" title="Open session" onclick="event.stopPropagation()">
+                <i class="ti ti-arrow-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="sc-expanded" id="s6">
+          <div class="sc-goals-label">Goals in this session</div>
+          <div class="goal-chips">
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--teal)"></div>
+              <span class="gc-text">Increase net revenue by 15% year-on-year</span>
+              <span class="gc-integrity int-ok">5/5</span>
+            </div>
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--teal)"></div>
+              <span class="gc-text">Reduce operating cost ratio from 68% to 55%</span>
+              <span class="gc-integrity int-ok">5/5</span>
+            </div>
+            <div class="goal-chip">
+              <div class="gc-dot" style="background:var(--teal)"></div>
+              <span class="gc-text">Achieve debt-to-equity ratio below 0.4 by year end</span>
+              <span class="gc-integrity int-ok">5/5</span>
+            </div>
+          </div>
+          <div class="sc-expanded-actions">
+            <button class="sea-btn"><i class="ti ti-download" aria-hidden="true"></i> Export</button>
+            <button class="sea-btn"><i class="ti ti-copy" aria-hidden="true"></i> Duplicate</button>
+            <button class="sea-btn primary">
+              <i class="ti ti-arrow-right" aria-hidden="true"></i> Open session
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- session-list -->
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" id="empty-state" role="status" aria-live="polite">
+      <i class="ti ti-search es-icon" aria-hidden="true"></i>
+      <div class="es-title">No sessions match your filter</div>
+      <p class="es-sub">Try a different search term or clear the filters.</p>
+      <button class="btn btn-ghost btn-sm" onclick="clearFilters()">Clear filters</button>
+    </div>
+
+    <!-- FREE TIER GATE -->
+    <div class="plan-gate" role="region" aria-label="Plan upgrade notice">
+      <div class="pg-icon"><i class="ti ti-lock" aria-hidden="true"></i></div>
+      <div class="pg-body">
+        <div class="pg-title">Saved sessions require a Professional plan</div>
+        <div class="pg-sub">You are on the free plan. Upgrade to save sessions, revisit cascades, and access previous exports.</div>
+      </div>
+      <button class="pg-btn" onclick="window.location.href='../signup.html'">
+        Upgrade — $38/mo
+      </button>
+    </div>
+
+  </div><!-- page-body -->
+</div><!-- app-layout -->
+
+<!-- DELETE CONFIRM -->
+<div class="confirm-overlay" id="confirm-overlay" onclick="closeConfirmIfOutside(event)">
+  <div class="confirm-modal" role="dialog" aria-modal="true" aria-label="Confirm deletion">
+    <div class="cm-title">Delete this session?</div>
+    <p class="cm-sub">This will permanently remove the cascade session and all its outputs. This cannot be undone.</p>
+    <div class="cm-actions">
+      <button class="cm-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="cm-delete" onclick="deleteSession()">Delete session</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let sessionToDelete = null;
+
+  /* ── EXPAND / COLLAPSE ── */
+  function toggleExpand(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('open');
+  }
+
+  /* ── SEARCH ── */
+  function filterSessions(query) {
+    const q = query.toLowerCase().trim();
+    let visible = 0;
+    document.querySelectorAll('.session-card').forEach(card => {
+      const text = card.getAttribute('data-search') || '';
+      const show = !q || text.includes(q);
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    checkEmpty(visible);
+  }
+
+  /* ── STATUS FILTER ── */
+  function filterByStatus(val) {
+    let visible = 0;
+    document.querySelectorAll('.session-card').forEach(card => {
+      const status = card.getAttribute('data-status');
+      const show = val === 'all' || status === val;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    checkEmpty(visible);
+  }
+
+  /* ── ORG FILTER ── */
+  function filterByOrg(val) {
+    let visible = 0;
+    document.querySelectorAll('.session-card').forEach(card => {
+      const org = card.getAttribute('data-org');
+      const show = val === 'all' || org === val;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    checkEmpty(visible);
+  }
+
+  /* ── EMPTY STATE ── */
+  function checkEmpty(count) {
+    document.getElementById('empty-state').classList.toggle('show', count === 0);
+  }
+
+  function clearFilters() {
+    document.querySelector('.search-input').value = '';
+    document.querySelectorAll('.filter-select').forEach(s => s.value = 'all');
+    document.querySelectorAll('.session-card').forEach(c => c.style.display = '');
+    document.getElementById('empty-state').classList.remove('show');
+  }
+
+  /* ── EXPORT ── */
+  function exportSession(id) {
+    /* wire up to real export */
+    alert('Exporting session ' + id + ' — wire up to your export API.');
+  }
+
+  /* ── DELETE ── */
+  function confirmDelete(id) {
+    sessionToDelete = id;
+    document.getElementById('confirm-overlay').classList.add('open');
+  }
+  function closeConfirm() {
+    document.getElementById('confirm-overlay').classList.remove('open');
+    sessionToDelete = null;
+  }
+  function closeConfirmIfOutside(e) {
+    if (e.target === document.getElementById('confirm-overlay')) closeConfirm();
+  }
+  function deleteSession() {
+    if (!sessionToDelete) return;
+    const card = document.querySelector(
+      `[data-search][id]`
+    );
+    /* find parent session-card of toggled expand div */
+    const expand = document.getElementById(sessionToDelete);
+    if (expand) expand.closest('.session-card')?.remove();
+    closeConfirm();
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeConfirm(); });
+</script>
+
+</body>
+</html>

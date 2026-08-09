@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Cascade — Karis Cascade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="../assets/css/karis-cascade.css" />
+  <style>
+    body { background: var(--page-bg); }
+
+    /* ── APP LAYOUT ── */
+    .app-layout {
+      display: grid;
+      grid-template-rows: 52px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── MAIN CANVAS ── */
+    .app-canvas {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px 80px;
+      overflow-y: auto;
+    }
+
+    /* ── WIZARD SHELL ── */
+    .wizard {
+      width: 100%;
+      max-width: 680px;
+    }
+
+    /* ── STEP PROGRESS BAR ── */
+    .wizard-progress {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 40px;
+    }
+    .wp-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    .wp-step.active { color: var(--violet); }
+    .wp-step.done   { color: var(--teal); }
+    .wp-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1.5px solid var(--border-strong);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; font-weight: 700;
+      background: var(--white); flex-shrink: 0;
+      transition: all .2s;
+    }
+    .wp-step.active .wp-dot {
+      border-color: var(--violet); color: var(--violet);
+      background: var(--violet-light);
+    }
+    .wp-step.done .wp-dot {
+      border-color: var(--teal); background: var(--teal); color: #fff;
+    }
+    .wp-line {
+      flex: 1; height: 1.5px; background: var(--border);
+      margin: 0 8px; transition: background .3s;
+    }
+    .wp-line.done { background: var(--teal); }
+    .wp-label { display: none; }
+    @media (min-width: 520px) { .wp-label { display: inline; } }
+
+    /* ── SCREEN CONTAINER ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── SCREEN HEADER ── */
+    .screen-hd {
+      margin-bottom: 28px;
+    }
+    .screen-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem; color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .screen-sub {
+      font-size: .9rem; color: var(--text-muted); line-height: 1.55;
+    }
+
+    /* ── INPUT TYPE CARDS ── */
+    .input-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .input-card {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 22px 20px;
+      cursor: pointer;
+      transition: all .15s;
+      background: var(--white);
+      position: relative;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+    .input-card:hover {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px var(--violet-light);
+    }
+    .input-card.selected {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px var(--violet-light);
+      background: var(--white);
+    }
+    .ic-check {
+      position: absolute; top: 14px; right: 14px;
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 1.5px solid var(--border-strong);
+      background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .input-card.selected .ic-check {
+      background: var(--violet); border-color: var(--violet);
+    }
+    .input-card.selected .ic-check::after {
+      content: ''; width: 6px; height: 6px;
+      border-radius: 50%; background: #fff;
+    }
+    .ic-icon {
+      width: 40px; height: 40px; border-radius: var(--radius-sm);
+      background: var(--violet-light);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px;
+    }
+    .ic-icon i { font-size: 20px; color: var(--violet); }
+    .ic-title {
+      font-size: .9rem; font-weight: 600;
+      color: var(--text-primary); margin-bottom: 5px;
+    }
+    .ic-desc {
+      font-size: .8rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .ic-tag {
+      display: inline-block; margin-top: 10px;
+      font-size: .68rem; font-weight: 600;
+      color: var(--text-muted); background: var(--page-bg);
+      border: 1px solid var(--border);
+      padding: 2px 8px; border-radius: 99px;
+    }
+
+    /* ── FREE TEXT INPUT ── */
+    .goal-textarea-wrap { margin-bottom: 16px; }
+    .goal-textarea {
+      width: 100%; min-height: 100px;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-md);
+      font-family: 'Inter', sans-serif; font-size: .9rem;
+      color: var(--text-primary); line-height: 1.55;
+      resize: vertical; outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .goal-textarea:focus {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px var(--violet-light);
+    }
+    .goal-textarea::placeholder { color: var(--text-muted); }
+    .char-count {
+      font-size: .72rem; color: var(--text-muted);
+      text-align: right; margin-top: 4px;
+    }
+
+    /* ── UPLOAD ZONE ── */
+    .upload-zone {
+      border: 1.5px dashed var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      background: var(--white);
+      margin-bottom: 16px;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--violet);
+      background: var(--violet-light);
+    }
+    .upload-zone.uploaded {
+      border-style: solid;
+      border-color: var(--teal);
+      background: var(--teal-light);
+    }
+    .uz-icon {
+      font-size: 32px; color: var(--text-muted);
+      margin-bottom: 10px; display: block;
+      transition: color .2s;
+    }
+    .upload-zone:hover .uz-icon { color: var(--violet); }
+    .upload-zone.uploaded .uz-icon { color: var(--teal); }
+    .uz-title {
+      font-size: .9rem; font-weight: 600;
+      color: var(--text-primary); margin-bottom: 4px;
+    }
+    .uz-sub {
+      font-size: .82rem; color: var(--text-muted);
+    }
+    .uz-types {
+      font-size: .72rem; color: var(--text-muted);
+      margin-top: 8px;
+    }
+    .uz-success {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; font-size: .875rem; font-weight: 600; color: var(--teal);
+    }
+    .uz-change {
+      font-size: .75rem; color: var(--text-muted);
+      text-decoration: underline; cursor: pointer; margin-top: 4px;
+      display: block;
+    }
+    input[type="file"] { display: none; }
+
+    /* ── GOAL LIST (step 2) ── */
+    .goal-list {
+      display: flex; flex-direction: column; gap: 6px;
+      margin-bottom: 20px;
+    }
+    .goal-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-md);
+      background: var(--white); cursor: pointer;
+      transition: all .15s;
+    }
+    .goal-item:hover { border-color: var(--border-strong); }
+    .goal-item.checked { border-color: var(--violet); background: var(--violet-light); }
+    .gi-cb {
+      width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0;
+      border: 1.5px solid var(--border-strong); background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px; transition: all .15s;
+    }
+    .goal-item.checked .gi-cb {
+      background: var(--violet); border-color: var(--violet);
+    }
+    .gi-cb-check {
+      font-size: 11px; color: #fff; display: none;
+    }
+    .goal-item.checked .gi-cb-check { display: block; }
+    .gi-body { flex: 1; min-width: 0; }
+    .gi-text {
+      font-size: .875rem; color: var(--text-primary);
+      font-weight: 500; margin-bottom: 2px; line-height: 1.35;
+    }
+    .gi-meta {
+      font-size: .75rem; color: var(--text-muted);
+    }
+    .gi-badge {
+      font-size: .65rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 99px; white-space: nowrap; flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .gb-process   { background: #EFF6FF; color: #1D4ED8; }
+    .gb-policy    { background: #FFFBEB; color: #92400E; }
+    .gb-people    { background: #F0FDF4; color: #166534; }
+
+    .goal-limit-notice {
+      display: none;
+      align-items: center; gap: 8px;
+      padding: 10px 14px;
+      background: #FFFBEB; border: 1px solid #FDE68A;
+      border-radius: var(--radius-sm);
+      font-size: .82rem; color: #92400E;
+      margin-bottom: 16px;
+    }
+    .goal-limit-notice.show { display: flex; }
+
+    /* ── CONTEXT FIELDS (step 3) ── */
+    .role-cards {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 8px; margin-bottom: 20px;
+    }
+    .role-card {
+      border: 1.5px solid var(--border); border-radius: var(--radius-md);
+      padding: 16px 12px; cursor: pointer; text-align: center;
+      background: var(--white); transition: all .15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .role-card:hover { border-color: var(--violet); }
+    .role-card.selected {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px var(--violet-light);
+      background: var(--violet-light);
+    }
+    .rc-icon {
+      font-size: 22px; color: var(--text-muted);
+      margin-bottom: 8px; display: block;
+    }
+    .role-card.selected .rc-icon { color: var(--violet); }
+    .rc-title {
+      font-size: .82rem; font-weight: 600;
+      color: var(--text-primary); margin-bottom: 2px;
+    }
+    .rc-sub {
+      font-size: .72rem; color: var(--text-muted);
+    }
+
+    .ctx-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; margin-bottom: 20px;
+    }
+    .ctx-field {}
+    .ctx-label {
+      display: block; font-size: .78rem; font-weight: 600;
+      color: var(--text-secondary); margin-bottom: 5px;
+    }
+    .ctx-input {
+      width: 100%; height: 40px; padding: 0 12px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif; font-size: .875rem;
+      color: var(--text-primary); background: var(--white);
+      outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    .ctx-input:focus {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px var(--violet-light);
+    }
+    .ctx-select {
+      width: 100%; height: 40px; padding: 0 12px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif; font-size: .875rem;
+      color: var(--text-primary); background: var(--white);
+      outline: none; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .ctx-select:focus {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px var(--violet-light);
+    }
+    .ctx-hint {
+      font-size: .72rem; color: var(--text-muted);
+      margin-top: 4px; line-height: 1.4;
+    }
+
+    .owner-notice {
+      display: flex; align-items: flex-start; gap: 9px;
+      padding: 12px 14px;
+      background: var(--violet-light); border: 1px solid var(--violet-border);
+      border-radius: var(--radius-sm); margin-bottom: 20px;
+      font-size: .82rem; color: var(--violet-dark); line-height: 1.5;
+    }
+    .owner-notice i { flex-shrink: 0; margin-top: 1px; color: var(--violet); }
+
+    /* ── GENERATE SUMMARY (step 4) ── */
+    .summary-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .summary-header {
+      background: var(--navy); padding: 16px 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sh-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--violet); }
+    .sh-title {
+      font-size: .82rem; font-weight: 600; color: rgba(255,255,255,.7);
+      letter-spacing: .04em;
+    }
+    .sh-session {
+      font-size: .75rem; color: #475569; margin-left: auto;
+    }
+    .summary-body { padding: 0; }
+    .sum-row {
+      display: flex; align-items: flex-start;
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+      gap: 16px;
+    }
+    .sum-row:last-child { border-bottom: none; }
+    .sum-label {
+      font-size: .72rem; font-weight: 700; letter-spacing: .05em;
+      text-transform: uppercase; color: var(--text-muted);
+      min-width: 90px; padding-top: 1px;
+    }
+    .sum-val {
+      font-size: .875rem; color: var(--text-primary); flex: 1;
+    }
+    .sum-goals-list {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .sum-goal-item {
+      display: flex; align-items: center; gap: 7px;
+      font-size: .82rem; color: var(--text-secondary);
+    }
+    .sgi-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--violet); flex-shrink: 0;
+    }
+
+    .output-preview-list {
+      display: flex; flex-direction: column; gap: 6px;
+      margin-bottom: 24px;
+    }
+    .op-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: .85rem; color: var(--text-secondary);
+    }
+    .op-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+
+    /* ── FOOTER ACTIONS ── */
+    .wizard-foot {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+    .wf-back {
+      font-size: .82rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 5px;
+      background: none; border: none; cursor: pointer;
+      font-family: 'Inter', sans-serif; padding: 0;
+      transition: color .15s;
+    }
+    .wf-back:hover { color: var(--text-secondary); }
+    .wf-hint { font-size: .75rem; color: var(--text-muted); }
+
+    .btn-next {
+      height: 44px; padding: 0 28px;
+      background: var(--violet); color: #fff; border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif; font-size: .875rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+      display: flex; align-items: center; gap: 7px;
+      opacity: .45; pointer-events: none;
+    }
+    .btn-next.ready { opacity: 1; pointer-events: all; }
+    .btn-next.ready:hover { background: var(--violet-mid); }
+
+    .btn-generate {
+      height: 48px; padding: 0 36px;
+      background: var(--violet); color: #fff; border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif; font-size: .95rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-generate:hover { background: var(--violet-mid); }
+    .btn-generate .spinner {
+      display: none; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
+      border-radius: 50%; animation: spin .6s linear infinite;
+    }
+    .btn-generate.loading .spinner   { display: block; }
+    .btn-generate.loading .gen-label { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .input-cards  { grid-template-columns: 1fr; }
+      .role-cards   { grid-template-columns: 1fr; }
+      .ctx-grid     { grid-template-columns: 1fr; }
+      .wizard-foot  { flex-direction: column-reverse; gap: 12px; align-items: stretch; }
+      .btn-next, .btn-generate { width: 100%; justify-content: center; }
+      .wf-back      { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+  <!-- APP NAV -->
+  <nav class="app-nav" role="navigation" aria-label="Cascade app navigation">
+    <div class="app-nav-left">
+      <a href="https://karismind.com" class="back-link">
+        <i class="ti ti-arrow-left" style="font-size:12px"></i>
+        Karis Mind
+      </a>
+      <span class="nav-sep">›</span>
+      <span class="nav-product">
+        <span class="nav-product-dot"></span>
+        Cascade
+      </span>
+    </div>
+    <div class="app-nav-right">
+      <a href="sessions.html" class="nav-link">Sessions</a>
+      <a href="settings.html" class="nav-link">Account</a>
+      <div class="nav-avatar" title="Your account">BM</div>
+    </div>
+  </nav>
+
+  <!-- CANVAS -->
+  <div class="app-canvas">
+    <div class="wizard">
+
+      <!-- PROGRESS -->
+      <div class="wizard-progress" role="list" aria-label="Setup progress">
+        <div class="wp-step active" id="ps0" role="listitem">
+          <div class="wp-dot" id="pd0">1</div>
+          <span class="wp-label">Input</span>
+        </div>
+        <div class="wp-line" id="pl0"></div>
+        <div class="wp-step" id="ps1" role="listitem">
+          <div class="wp-dot" id="pd1">2</div>
+          <span class="wp-label">Goals</span>
+        </div>
+        <div class="wp-line" id="pl1"></div>
+        <div class="wp-step" id="ps2" role="listitem">
+          <div class="wp-dot" id="pd2">3</div>
+          <span class="wp-label">Context</span>
+        </div>
+        <div class="wp-line" id="pl2"></div>
+        <div class="wp-step" id="ps3" role="listitem">
+          <div class="wp-dot" id="pd3">4</div>
+          <span class="wp-label">Generate</span>
+        </div>
+      </div>
+
+      <!-- ══ SCREEN 1 — INPUT TYPE ══ -->
+      <div class="screen active" id="screen-1">
+        <div class="screen-hd">
+          <h1 class="screen-title">How are you bringing your goals?</h1>
+          <p class="screen-sub">Choose the format that matches what you have. You can change this later.</p>
+        </div>
+
+        <div class="input-cards" role="group" aria-label="Input type selection">
+
+          <button class="input-card" id="ic-type" onclick="selectInputType('type', this)" aria-pressed="false">
+            <div class="ic-check" aria-hidden="true"></div>
+            <div class="ic-icon"><i class="ti ti-pencil" aria-hidden="true"></i></div>
+            <div class="ic-title">Type a goal</div>
+            <div class="ic-desc">Paste or write one corporate goal in plain language. No file needed.</div>
+            <span class="ic-tag">Fastest start</span>
+          </button>
+
+          <button class="input-card" id="ic-workplan" onclick="selectInputType('workplan', this)" aria-pressed="false">
+            <div class="ic-check" aria-hidden="true"></div>
+            <div class="ic-icon"><i class="ti ti-file-text" aria-hidden="true"></i></div>
+            <div class="ic-title">Annual workplan</div>
+            <div class="ic-desc">Upload your workplan. Cascade extracts all corporate goals for you to select from.</div>
+            <span class="ic-tag">.pdf · .docx</span>
+          </button>
+
+          <button class="input-card" id="ic-scorecard" onclick="selectInputType('scorecard', this)" aria-pressed="false">
+            <div class="ic-check" aria-hidden="true"></div>
+            <div class="ic-icon"><i class="ti ti-table" aria-hidden="true"></i></div>
+            <div class="ic-title">Balanced scorecard</div>
+            <div class="ic-desc">Upload your BSC. Cascade maps each perspective to its delivery level automatically.</div>
+            <span class="ic-tag">.xlsx · .csv</span>
+          </button>
+
+          <button class="input-card" id="ic-strategic" onclick="selectInputType('strategic', this)" aria-pressed="false">
+            <div class="ic-check" aria-hidden="true"></div>
+            <div class="ic-icon"><i class="ti ti-book" aria-hidden="true"></i></div>
+            <div class="ic-title">Strategic plan</div>
+            <div class="ic-desc">Upload your strategic plan. Cascade finds the objectives section and surfaces cascadable goals.</div>
+            <span class="ic-tag">.pdf · .docx</span>
+          </button>
+
+        </div>
+
+        <!-- TYPE INPUT — shown when 'type' selected -->
+        <div id="type-input" style="display:none">
+          <div class="goal-textarea-wrap">
+            <textarea
+              class="goal-textarea"
+              id="goal-text"
+              placeholder="e.g. Increase revenue collection efficiency from 72% to 90% by December 2026"
+              maxlength="400"
+              oninput="onGoalTextInput(this)"
+              aria-label="Enter your corporate goal"
+            ></textarea>
+            <div class="char-count"><span id="char-count">0</span> / 400</div>
+          </div>
+        </div>
+
+        <!-- FILE UPLOAD — shown for upload types -->
+        <div id="file-input" style="display:none">
+          <div class="upload-zone" id="upload-zone"
+            onclick="triggerUpload()"
+            ondragover="handleDragOver(event)"
+            ondragleave="handleDragLeave(event)"
+            ondrop="handleDrop(event)"
+            role="button" tabindex="0"
+            aria-label="Upload document"
+          >
+            <i class="ti ti-upload uz-icon" id="uz-icon" aria-hidden="true"></i>
+            <div class="uz-title" id="uz-title">Drop your document here or click to browse</div>
+            <div class="uz-sub"  id="uz-sub">Cascade will read it and extract your goals</div>
+            <div class="uz-types" id="uz-types">.pdf · .docx · .doc</div>
+          </div>
+          <input type="file" id="file-upload" accept=".pdf,.docx,.doc,.xlsx,.xls,.csv" onchange="handleFileSelect(this)" />
+        </div>
+
+        <div class="wizard-foot">
+          <span class="wf-hint">No account data is stored without your confirmation</span>
+          <button class="btn-next" id="btn-next-1" onclick="goToScreen(2)">
+            Next <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ══ SCREEN 2 — GOAL SELECTION ══ -->
+      <div class="screen" id="screen-2">
+        <div class="screen-hd">
+          <h1 class="screen-title">Select goals to cascade</h1>
+          <p class="screen-sub" id="s2-sub">Choose up to 4 goals for this session. Cascade found the following in your document.</p>
+        </div>
+
+        <div class="goal-list" id="goal-list" role="group" aria-label="Goal selection">
+          <!-- populated by JS -->
+        </div>
+
+        <div class="goal-limit-notice" id="goal-limit" role="alert">
+          <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+          Maximum 4 goals per session. Deselect one to add another.
+        </div>
+
+        <div class="wizard-foot">
+          <button class="wf-back" onclick="goToScreen(1)">
+            <i class="ti ti-arrow-left" aria-hidden="true"></i> Back
+          </button>
+          <button class="btn-next" id="btn-next-2" onclick="goToScreen(3)">
+            Next <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ══ SCREEN 3 — CONTEXT ══ -->
+      <div class="screen" id="screen-3">
+        <div class="screen-hd">
+          <h1 class="screen-title">Your context</h1>
+          <p class="screen-sub">Tell Cascade who this cascade is for and at what level. Owners can be named after generation.</p>
+        </div>
+
+        <!-- scope -->
+        <div style="margin-bottom:20px">
+          <div class="ctx-label" style="margin-bottom:8px">This cascade is for</div>
+          <div class="role-cards" role="group" aria-label="Cascade scope">
+            <button class="role-card" id="rc-me" onclick="selectRole('me', this)">
+              <i class="ti ti-user rc-icon" aria-hidden="true"></i>
+              <div class="rc-title">Just me</div>
+              <div class="rc-sub">My own contract</div>
+            </button>
+            <button class="role-card" id="rc-dept" onclick="selectRole('dept', this)">
+              <i class="ti ti-users rc-icon" aria-hidden="true"></i>
+              <div class="rc-title">My department</div>
+              <div class="rc-sub">Team or unit</div>
+            </button>
+            <button class="role-card" id="rc-org" onclick="selectRole('org', this)">
+              <i class="ti ti-building rc-icon" aria-hidden="true"></i>
+              <div class="rc-title">Whole organisation</div>
+              <div class="rc-sub">All levels</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- fields -->
+        <div class="ctx-grid">
+          <div class="ctx-field">
+            <label class="ctx-label" for="ctx-sector">Sector</label>
+            <select class="ctx-select" id="ctx-sector" onchange="checkContext()">
+              <option value="">Select sector</option>
+              <option value="water">Water and sanitation</option>
+              <option value="mining">Mining and extractives</option>
+              <option value="finance">Financial services</option>
+              <option value="health">Health</option>
+              <option value="education">Education</option>
+              <option value="govt">Government / public sector</option>
+              <option value="ngo">NGO / development</option>
+              <option value="energy">Energy and utilities</option>
+              <option value="agri">Agriculture</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="ctx-field">
+            <label class="ctx-label" for="ctx-org">Organisation name</label>
+            <input class="ctx-input" type="text" id="ctx-org"
+              placeholder="e.g. Luapula Water" oninput="checkContext()" />
+          </div>
+        </div>
+
+        <div class="ctx-field" style="margin-bottom:20px">
+          <label class="ctx-label" for="ctx-position">Your position</label>
+          <input class="ctx-input" type="text" id="ctx-position"
+            placeholder="e.g. Planning Manager, HR Director, District Officer"
+            oninput="checkContext()" />
+          <div class="ctx-hint">Sets your starting level in the cascade chain.</div>
+        </div>
+
+        <div class="owner-notice">
+          <i class="ti ti-info-circle" aria-hidden="true"></i>
+          Owner names are optional at this stage. Cascade uses role placeholders and you assign real names after generation — no need to have the org chart in front of you.
+        </div>
+
+        <div class="wizard-foot">
+          <button class="wf-back" onclick="goToScreen(2)">
+            <i class="ti ti-arrow-left" aria-hidden="true"></i> Back
+          </button>
+          <button class="btn-next" id="btn-next-3" onclick="goToScreen(4)">
+            Next <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ══ SCREEN 4 — REVIEW & GENERATE ══ -->
+      <div class="screen" id="screen-4">
+        <div class="screen-hd">
+          <h1 class="screen-title">Ready to generate</h1>
+          <p class="screen-sub">Review your setup. Cascade will build the full six-level chain for each goal.</p>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-header">
+            <div class="sh-dot"></div>
+            <div class="sh-title">SESSION SUMMARY</div>
+            <div class="sh-session" id="sum-org-label">—</div>
+          </div>
+          <div class="summary-body">
+            <div class="sum-row">
+              <div class="sum-label">Input</div>
+              <div class="sum-val" id="sum-input">—</div>
+            </div>
+            <div class="sum-row">
+              <div class="sum-label">Goals</div>
+              <div class="sum-val">
+                <div class="sum-goals-list" id="sum-goals">—</div>
+              </div>
+            </div>
+            <div class="sum-row">
+              <div class="sum-label">Scope</div>
+              <div class="sum-val" id="sum-scope">—</div>
+            </div>
+            <div class="sum-row">
+              <div class="sum-label">Sector</div>
+              <div class="sum-val" id="sum-sector">—</div>
+            </div>
+            <div class="sum-row">
+              <div class="sum-label">Position</div>
+              <div class="sum-val" id="sum-position">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:8px;font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted)">
+          You will receive
+        </div>
+        <div class="output-preview-list">
+          <div class="op-item">
+            <div class="op-dot" style="background:#1D9E75"></div>
+            Six-level cascade chain for each goal — KPI, owner, and tasks at every level
+          </div>
+          <div class="op-item">
+            <div class="op-dot" style="background:#2563EB"></div>
+            Department KPI view — who owns what, measured how
+          </div>
+          <div class="op-item">
+            <div class="op-dot" style="background:#7C3AED"></div>
+            Individual performance contract — daily tasks for your position
+          </div>
+          <div class="op-item">
+            <div class="op-dot" style="background:#D97706"></div>
+            Cascade integrity check — five-point trace before export
+          </div>
+          <div class="op-item" id="op-extra" style="display:none">
+            <div class="op-dot" style="background:#16A34A"></div>
+            Organisation view — full cascade across all departments
+          </div>
+        </div>
+
+        <div class="wizard-foot">
+          <button class="wf-back" onclick="goToScreen(3)">
+            <i class="ti ti-arrow-left" aria-hidden="true"></i> Edit
+          </button>
+          <button class="btn-generate" id="btn-generate" onclick="generate()">
+            <span class="gen-label">
+              <i class="ti ti-git-branch" aria-hidden="true"></i>
+              Generate cascade
+            </span>
+            <div class="spinner" aria-hidden="true"></div>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- wizard -->
+  </div><!-- canvas -->
+
+</div><!-- app-layout -->
+
+<script>
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+const state = {
+  inputType:     null,   /* 'type' | 'workplan' | 'scorecard' | 'strategic' */
+  goalText:      '',
+  uploadedFile:  null,
+  selectedGoals: [],
+  role:          null,
+  sector:        '',
+  org:           '',
+  position:      ''
+};
+
+const GOALS_DEMO = [
+  { id:0, text:'Enhance financial sustainability and operational efficiency',       meta:'ZMW 13,599,400 · Director of Finance', badge:'gb-policy',  label:'Policy'  },
+  { id:1, text:'Provide reliable and equitable water supply across the province',   meta:'ZMW 27,055,000 · Technical Services',  badge:'gb-process', label:'Process' },
+  { id:2, text:'Improve access to safe and sustainable sanitation services',         meta:'ZMW 1,740,000 · Technical Services',   badge:'gb-people',  label:'People'  },
+  { id:3, text:'Deliver excellent customer service and stakeholder engagement',      meta:'HPR&M / Ag. MCS',                      badge:'gb-people',  label:'People'  },
+  { id:4, text:'Build institutional capacity and strengthen governance',             meta:'Director of HR',                        badge:'gb-policy',  label:'Policy'  },
+  { id:5, text:'Promote water stewardship and environmental sustainability',         meta:'Technical Services',                    badge:'gb-process', label:'Process' },
+];
+
+/* ═══════════════════════════════════════
+   PROGRESS BAR
+═══════════════════════════════════════ */
+function setProgress(current) {
+  for (let i = 0; i < 4; i++) {
+    const step = document.getElementById('ps' + i);
+    const dot  = document.getElementById('pd' + i);
+    step.classList.remove('active','done');
+    if (i < current - 1) {
+      step.classList.add('done');
+      dot.innerHTML = '<i class="ti ti-check" style="font-size:11px;color:#fff"></i>';
+      if (i < 3) document.getElementById('pl' + i).classList.add('done');
+    } else if (i === current - 1) {
+      step.classList.add('active');
+      dot.textContent = i + 1;
+    } else {
+      dot.textContent = i + 1;
+      if (i > 0) document.getElementById('pl' + (i-1))?.classList.remove('done');
+    }
+  }
+}
+
+/* ═══════════════════════════════════════
+   SCREEN NAVIGATION
+═══════════════════════════════════════ */
+function goToScreen(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + n).classList.add('active');
+  setProgress(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (n === 2) populateGoalList();
+  if (n === 4) buildSummary();
+}
+
+/* ═══════════════════════════════════════
+   SCREEN 1 — INPUT TYPE
+═══════════════════════════════════════ */
+function selectInputType(type, el) {
+  state.inputType = type;
+  document.querySelectorAll('.input-card').forEach(c => {
+    c.classList.remove('selected');
+    c.setAttribute('aria-pressed','false');
+  });
+  el.classList.add('selected');
+  el.setAttribute('aria-pressed','true');
+
+  /* show relevant sub-input */
+  document.getElementById('type-input').style.display = type === 'type' ? 'block' : 'none';
+  document.getElementById('file-input').style.display = type !== 'type' ? 'block' : 'none';
+
+  /* update upload zone file types */
+  const typeMap = {
+    workplan:  { types:'.pdf,.docx,.doc', label:'PDF or Word document' },
+    scorecard: { types:'.xlsx,.xls,.csv', label:'Excel or CSV file' },
+    strategic: { types:'.pdf,.docx',      label:'PDF or Word document' },
+  };
+  if (type !== 'type') {
+    const m = typeMap[type];
+    document.getElementById('uz-types').textContent = m.types;
+    document.getElementById('uz-sub').textContent   = m.label;
+    document.getElementById('file-upload').accept   = m.types;
+    /* reset upload zone if switching type */
+    if (!state.uploadedFile) resetUploadZone();
+  }
+
+  checkScreen1Ready();
+}
+
+function onGoalTextInput(el) {
+  state.goalText = el.value;
+  document.getElementById('char-count').textContent = el.value.length;
+  checkScreen1Ready();
+}
+
+function checkScreen1Ready() {
+  const ready = (
+    (state.inputType === 'type' && state.goalText.trim().length > 10) ||
+    (state.inputType && state.inputType !== 'type' && state.uploadedFile)
+  );
+  document.getElementById('btn-next-1').classList.toggle('ready', ready);
+}
+
+/* ── Upload handlers ── */
+function triggerUpload() {
+  document.getElementById('file-upload').click();
+}
+
+function handleFileSelect(input) {
+  if (input.files && input.files[0]) processFile(input.files[0]);
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.add('drag-over');
+}
+function handleDragLeave(e) {
+  document.getElementById('upload-zone').classList.remove('drag-over');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+}
+
+function processFile(file) {
+  state.uploadedFile = file;
+  const zone = document.getElementById('upload-zone');
+  zone.classList.add('uploaded');
+  zone.innerHTML = `
+    <div class="uz-success">
+      <i class="ti ti-circle-check" style="font-size:20px"></i>
+      ${file.name}
+    </div>
+    <span class="uz-change" onclick="resetUploadZone(); event.stopPropagation();">Choose a different file</span>
+  `;
+  checkScreen1Ready();
+}
+
+function resetUploadZone() {
+  state.uploadedFile = null;
+  const zone = document.getElementById('upload-zone');
+  zone.classList.remove('uploaded','drag-over');
+  zone.innerHTML = `
+    <i class="ti ti-upload uz-icon" id="uz-icon"></i>
+    <div class="uz-title" id="uz-title">Drop your document here or click to browse</div>
+    <div class="uz-sub"  id="uz-sub">Cascade will read it and extract your goals</div>
+    <div class="uz-types" id="uz-types">.pdf · .docx · .doc</div>
+  `;
+  checkScreen1Ready();
+}
+
+/* ═══════════════════════════════════════
+   SCREEN 2 — GOAL SELECTION
+═══════════════════════════════════════ */
+function populateGoalList() {
+  const list = document.getElementById('goal-list');
+  const sub  = document.getElementById('s2-sub');
+
+  if (state.inputType === 'type') {
+    /* single goal typed — auto-select, skip to context */
+    state.selectedGoals = [{ id: 99, text: state.goalText.trim(), meta:'Typed goal', badge:'gb-process', label:'Process' }];
+    sub.textContent = 'Your goal has been added. Continue to set your context.';
+    list.innerHTML = `
+      <div class="goal-item checked" style="pointer-events:none">
+        <div class="gi-cb"><i class="ti ti-check gi-cb-check" style="display:block;font-size:11px"></i></div>
+        <div class="gi-body">
+          <div class="gi-text">${state.goalText.trim()}</div>
+          <div class="gi-meta">Typed goal · classified on generation</div>
+        </div>
+      </div>`;
+    document.getElementById('btn-next-2').classList.add('ready');
+    return;
+  }
+
+  sub.textContent = 'Cascade found the following goals in your document. Choose up to 4 for this session.';
+  list.innerHTML = '';
+  state.selectedGoals = [];
+  document.getElementById('btn-next-2').classList.remove('ready');
+
+  GOALS_DEMO.forEach(g => {
+    const item = document.createElement('div');
+    item.className = 'goal-item';
+    item.setAttribute('role','checkbox');
+    item.setAttribute('aria-checked','false');
+    item.innerHTML = `
+      <div class="gi-cb"><i class="ti ti-check gi-cb-check"></i></div>
+      <div class="gi-body">
+        <div class="gi-text">${g.text}</div>
+        <div class="gi-meta">${g.meta}</div>
+      </div>
+      <span class="gi-badge ${g.badge}">${g.label}</span>`;
+    item.addEventListener('click', () => toggleGoal(g, item));
+    list.appendChild(item);
+  });
+}
+
+function toggleGoal(g, el) {
+  const isChecked = el.classList.contains('checked');
+  if (!isChecked && state.selectedGoals.length >= 4) {
+    document.getElementById('goal-limit').classList.add('show');
+    return;
+  }
+  document.getElementById('goal-limit').classList.remove('show');
+
+  if (isChecked) {
+    el.classList.remove('checked');
+    el.setAttribute('aria-checked','false');
+    state.selectedGoals = state.selectedGoals.filter(x => x.id !== g.id);
+  } else {
+    el.classList.add('checked');
+    el.setAttribute('aria-checked','true');
+    state.selectedGoals.push(g);
+  }
+  document.getElementById('btn-next-2').classList.toggle('ready', state.selectedGoals.length > 0);
+}
+
+/* ═══════════════════════════════════════
+   SCREEN 3 — CONTEXT
+═══════════════════════════════════════ */
+function selectRole(role, el) {
+  state.role = role;
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('op-extra').style.display = role === 'org' ? 'flex' : 'none';
+  checkContext();
+}
+
+function checkContext() {
+  state.sector   = document.getElementById('ctx-sector').value;
+  state.org      = document.getElementById('ctx-org').value.trim();
+  state.position = document.getElementById('ctx-position').value.trim();
+  const ready = state.role && state.sector && state.position.length > 1;
+  document.getElementById('btn-next-3').classList.toggle('ready', ready);
+}
+
+/* ═══════════════════════════════════════
+   SCREEN 4 — SUMMARY
+═══════════════════════════════════════ */
+const inputLabels = {
+  type:      'Goal typed manually',
+  workplan:  'Annual workplan — ' + (state.uploadedFile?.name || 'document uploaded'),
+  scorecard: 'Balanced scorecard — document uploaded',
+  strategic: 'Strategic plan — document uploaded'
+};
+const scopeLabels = {
+  me:   'Individual — my own performance contract',
+  dept: 'Department — team or unit KPIs',
+  org:  'Organisation — full cascade across all levels'
+};
+const sectorLabels = {
+  water:'Water and sanitation', mining:'Mining and extractives',
+  finance:'Financial services', health:'Health', education:'Education',
+  govt:'Government / public sector', ngo:'NGO / development',
+  energy:'Energy and utilities', agri:'Agriculture', other:'Other'
+};
+
+function buildSummary() {
+  const fname = state.uploadedFile?.name || '';
+  document.getElementById('sum-input').textContent =
+    state.inputType === 'type' ? 'Goal typed manually' :
+    state.inputType === 'workplan'  ? `Annual workplan — ${fname}` :
+    state.inputType === 'scorecard' ? `Balanced scorecard — ${fname}` :
+    `Strategic plan — ${fname}`;
+
+  const goalsEl = document.getElementById('sum-goals');
+  goalsEl.innerHTML = state.selectedGoals.map(g =>
+    `<div class="sum-goal-item"><div class="sgi-dot"></div>${g.text.length > 60 ? g.text.substring(0,60)+'…' : g.text}</div>`
+  ).join('');
+
+  document.getElementById('sum-scope').textContent    = scopeLabels[state.role] || '—';
+  document.getElementById('sum-sector').textContent   = sectorLabels[state.sector] || '—';
+  document.getElementById('sum-position').textContent = state.position || '—';
+  document.getElementById('sum-org-label').textContent = state.org || 'Your session';
+}
+
+/* ═══════════════════════════════════════
+   GENERATE
+═══════════════════════════════════════ */
+function generate() {
+  const btn = document.getElementById('btn-generate');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  /* store session state for output page */
+  try {
+    sessionStorage.setItem('cascade_session', JSON.stringify({
+      inputType:     state.inputType,
+      selectedGoals: state.selectedGoals,
+      role:          state.role,
+      sector:        state.sector,
+      org:           state.org,
+      position:      state.position,
+      goalText:      state.goalText
+    }));
+  } catch(e) {}
+
+  /* simulate generation — replace with real API call */
+  setTimeout(() => {
+    window.location.href = 'output.html';
+  }, 2000);
+}
+</script>
+
+</body>
+</html>

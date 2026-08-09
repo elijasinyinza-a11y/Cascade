@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reset password — Karis Cascade</title>
+  <meta name="description" content="Reset your Karis Cascade password." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="assets/css/karis-cascade.css" />
+  <style>
+    body { background: var(--page-bg); }
+
+    .auth-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* LEFT — brand */
+    .auth-brand {
+      background: var(--navy);
+      display: flex; flex-direction: column;
+      padding: 48px; position: relative; overflow: hidden;
+    }
+    .auth-brand::before {
+      content:''; position:absolute; top:-120px; left:-120px;
+      width:480px; height:480px; border-radius:50%;
+      background:radial-gradient(circle,rgba(124,92,191,.25) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .auth-brand::after {
+      content:''; position:absolute; bottom:-80px; right:-80px;
+      width:320px; height:320px; border-radius:50%;
+      background:radial-gradient(circle,rgba(29,158,117,.15) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .brand-top {
+      display:flex; align-items:center; gap:8px;
+      margin-bottom:auto; position:relative; z-index:1;
+    }
+    .brand-back {
+      font-size:12px; color:#475569; font-weight:500;
+      display:flex; align-items:center; gap:5px; transition:color .15s;
+    }
+    .brand-back:hover { color:#94A3B8; }
+    .brand-sep { color:#1E3A64; }
+    .brand-name {
+      font-size:13px; font-weight:600; color:#fff;
+      display:flex; align-items:center; gap:6px;
+    }
+    .brand-name-dot { width:7px; height:7px; border-radius:50%; background:var(--violet); }
+    .brand-body { margin-top:auto; position:relative; z-index:1; }
+    .brand-eyebrow {
+      font-size:.68rem; font-weight:700; letter-spacing:.1em;
+      text-transform:uppercase; color:var(--violet); margin-bottom:16px;
+    }
+    .brand-headline {
+      font-family:'DM Serif Display',serif;
+      font-size:clamp(1.6rem,3vw,2.2rem);
+      color:#fff; line-height:1.2; margin-bottom:16px;
+    }
+    .brand-headline em { font-style:italic; color:#C4B0E8; }
+    .brand-sub {
+      font-size:.9rem; color:rgba(255,255,255,.5);
+      line-height:1.65; max-width:340px;
+    }
+
+    /* RIGHT — form */
+    .auth-form-panel {
+      display:flex; flex-direction:column;
+      justify-content:center; align-items:center;
+      padding:48px 40px; background:var(--white);
+    }
+    .auth-form-wrap { width:100%; max-width:400px; }
+    .auth-form-header { margin-bottom:28px; }
+    .auth-form-title {
+      font-family:'DM Serif Display',serif;
+      font-size:1.8rem; color:var(--text-primary); margin-bottom:6px;
+    }
+    .auth-form-sub { font-size:.875rem; color:var(--text-muted); line-height:1.6; }
+
+    .field { margin-bottom:18px; }
+    .field-label {
+      display:block; font-size:.8rem; font-weight:600;
+      color:var(--text-secondary); margin-bottom:6px;
+    }
+    .field-input-wrap { position:relative; }
+    .field-input {
+      width:100%; height:44px; padding:0 14px 0 40px;
+      border:1.5px solid var(--border); border-radius:var(--radius-sm);
+      font-family:'Inter',sans-serif; font-size:.875rem;
+      color:var(--text-primary); background:var(--white);
+      transition:border-color .15s, box-shadow .15s; outline:none;
+    }
+    .field-input:focus {
+      border-color:var(--violet);
+      box-shadow:0 0 0 3px var(--violet-light);
+    }
+    .field-input.error { border-color:#EF4444; }
+    .field-icon {
+      position:absolute; left:13px; top:50%; transform:translateY(-50%);
+      font-size:16px; color:var(--text-muted); pointer-events:none;
+    }
+    .field-error {
+      font-size:.75rem; color:#EF4444; margin-top:5px;
+      display:none; align-items:center; gap:4px;
+    }
+    .field-error.show { display:flex; }
+
+    .submit-btn {
+      width:100%; height:46px;
+      background:var(--violet); color:#fff; border:none;
+      border-radius:var(--radius-sm);
+      font-family:'Inter',sans-serif; font-size:.9rem; font-weight:600;
+      cursor:pointer; transition:background .15s;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      margin-bottom:20px;
+    }
+    .submit-btn:hover { background:var(--violet-mid); }
+    .submit-btn .spinner {
+      display:none; width:18px; height:18px;
+      border:2px solid rgba(255,255,255,.3); border-top-color:#fff;
+      border-radius:50%; animation:spin .6s linear infinite;
+    }
+    .submit-btn.loading .btn-text { display:none; }
+    .submit-btn.loading .spinner  { display:block; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .back-to-login {
+      text-align:center; font-size:.82rem; color:var(--text-muted);
+    }
+    .back-to-login a { color:var(--violet); font-weight:500; }
+    .back-to-login a:hover { text-decoration:underline; }
+
+    /* success state */
+    .success-state {
+      display:none; text-align:center;
+    }
+    .success-state.show { display:block; }
+    .success-icon {
+      width:56px; height:56px; border-radius:50%;
+      background:var(--teal-light); display:flex;
+      align-items:center; justify-content:center;
+      margin:0 auto 20px;
+    }
+    .success-icon i { font-size:28px; color:var(--teal); }
+    .success-title {
+      font-family:'DM Serif Display',serif;
+      font-size:1.5rem; color:var(--text-primary); margin-bottom:8px;
+    }
+    .success-text {
+      font-size:.875rem; color:var(--text-muted);
+      line-height:1.6; margin-bottom:24px;
+    }
+    .success-text strong { color:var(--text-secondary); }
+
+    @media (max-width:900px) {
+      .auth-shell { grid-template-columns:1fr; }
+      .auth-brand { display:none; }
+      .auth-form-panel { min-height:100vh; padding:32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-shell">
+
+  <!-- LEFT — brand -->
+  <div class="auth-brand">
+    <div class="brand-top">
+      <a href="https://karismind.com" class="brand-back">
+        <i class="ti ti-arrow-left" style="font-size:13px"></i>Karis Mind
+      </a>
+      <span class="brand-sep">›</span>
+      <span class="brand-name">
+        <span class="brand-name-dot"></span>Cascade
+      </span>
+    </div>
+    <div class="brand-body">
+      <div class="brand-eyebrow">Account recovery</div>
+      <h1 class="brand-headline">
+        Back to <em>execution</em><br>in a moment.
+      </h1>
+      <p class="brand-sub">
+        Enter your email and we'll send a secure link to reset your password.
+        Your sessions and cascades are exactly where you left them.
+      </p>
+    </div>
+  </div>
+
+  <!-- RIGHT — form -->
+  <div class="auth-form-panel">
+    <div class="auth-form-wrap">
+
+      <!-- FORM STATE -->
+      <div id="form-state">
+        <div class="auth-form-header">
+          <h2 class="auth-form-title">Reset your password</h2>
+          <p class="auth-form-sub">
+            Enter the email associated with your account and we'll send you a link to reset your password.
+          </p>
+        </div>
+
+        <form id="forgot-form" novalidate>
+          <div class="field">
+            <label class="field-label" for="email">Email address</label>
+            <div class="field-input-wrap">
+              <i class="ti ti-mail field-icon" aria-hidden="true"></i>
+              <input
+                class="field-input"
+                type="email"
+                id="email"
+                name="email"
+                placeholder="you@organisation.com"
+                autocomplete="email"
+                required
+              />
+            </div>
+            <div class="field-error" id="email-error">
+              <i class="ti ti-alert-circle"></i>
+              <span>Please enter a valid email address.</span>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submit-btn">
+            <span class="btn-text">Send reset link</span>
+            <div class="spinner" aria-hidden="true"></div>
+          </button>
+        </form>
+
+        <div class="back-to-login">
+          Remembered it? <a href="login.html">Back to sign in →</a>
+        </div>
+      </div>
+
+      <!-- SUCCESS STATE -->
+      <div class="success-state" id="success-state">
+        <div class="success-icon">
+          <i class="ti ti-mail-check" aria-hidden="true"></i>
+        </div>
+        <div class="success-title">Check your inbox</div>
+        <p class="success-text">
+          We've sent a password reset link to <strong id="sent-email">your email</strong>.
+          The link expires in 30 minutes. If you don't see it, check your spam folder.
+        </p>
+        <a href="login.html" class="submit-btn" style="text-decoration:none">
+          <span class="btn-text">Back to sign in</span>
+        </a>
+        <div class="back-to-login">
+          Didn't get it? <a href="#" onclick="resetForm();return false;">Try again →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const form = document.getElementById('forgot-form');
+  const emailInput = document.getElementById('email');
+  const emailError = document.getElementById('email-error');
+
+  emailInput.addEventListener('input', function () {
+    if (this.value.length > 0) {
+      this.classList.remove('error');
+      emailError.classList.remove('show');
+    }
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      emailInput.classList.add('error');
+      emailError.classList.add('show');
+      return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    /* simulate sending — replace with real API call */
+    setTimeout(() => {
+      document.getElementById('sent-email').textContent = email;
+      document.getElementById('form-state').style.display = 'none';
+      document.getElementById('success-state').classList.add('show');
+    }, 1400);
+  });
+
+  function resetForm() {
+    document.getElementById('success-state').classList.remove('show');
+    document.getElementById('form-state').style.display = 'block';
+    const btn = document.getElementById('submit-btn');
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    emailInput.value = '';
+    emailInput.focus();
+  }
+</script>
+
+</body>
+</html>

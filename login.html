@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign in — Karis Cascade</title>
+  <meta name="description" content="Sign in to Karis Cascade — workplan execution engine by Karis Mind." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="assets/css/karis-cascade.css" />
+  <style>
+
+    body { background: var(--page-bg); }
+
+    /* ── AUTH SHELL ── */
+    .auth-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── LEFT PANEL — brand ── */
+    .auth-brand {
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      padding: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* subtle radial glow */
+    .auth-brand::before {
+      content: '';
+      position: absolute;
+      top: -120px; left: -120px;
+      width: 480px; height: 480px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,92,191,.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .auth-brand::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; right: -80px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(29,158,117,.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .brand-top {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: auto; position: relative; z-index: 1;
+    }
+    .brand-back {
+      font-size: 12px; color: #475569; font-weight: 500;
+      display: flex; align-items: center; gap: 5px; transition: color .15s;
+    }
+    .brand-back:hover { color: #94A3B8; }
+    .brand-sep { color: #1E3A64; }
+    .brand-name {
+      font-size: 13px; font-weight: 600; color: #fff;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .brand-name-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--violet);
+    }
+
+    .brand-body {
+      margin-top: auto;
+      position: relative; z-index: 1;
+    }
+    .brand-eyebrow {
+      font-size: .68rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--violet);
+      margin-bottom: 16px;
+    }
+    .brand-headline {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      color: #fff; line-height: 1.2; margin-bottom: 16px;
+    }
+    .brand-headline em { font-style: italic; color: #C4B0E8; }
+    .brand-sub {
+      font-size: .9rem; color: rgba(255,255,255,.5);
+      line-height: 1.65; margin-bottom: 36px; max-width: 340px;
+    }
+
+    /* mini cascade preview */
+    .brand-preview {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      max-width: 360px;
+    }
+    .bp-label {
+      font-size: .65rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: rgba(255,255,255,.3);
+      margin-bottom: 12px;
+    }
+    .bp-chain { display: flex; flex-direction: column; gap: 6px; }
+    .bp-node {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 10px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 6px;
+      border-left: 2px solid transparent;
+    }
+    .bp-node.n0 { border-left-color: #1D9E75; }
+    .bp-node.n1 { border-left-color: #2563EB; }
+    .bp-node.n2 { border-left-color: #16A34A; }
+    .bp-node.n3 { border-left-color: #D97706; }
+    .bp-lbl {
+      font-size: .65rem; font-weight: 600; color: rgba(255,255,255,.3);
+      min-width: 58px; text-transform: uppercase; letter-spacing: .04em;
+    }
+    .bp-node.n0 .bp-lbl { color: rgba(29,158,117,.7); }
+    .bp-node.n1 .bp-lbl { color: rgba(37,99,235,.7); }
+    .bp-node.n2 .bp-lbl { color: rgba(22,163,74,.7); }
+    .bp-node.n3 .bp-lbl { color: rgba(217,119,6,.7); }
+    .bp-text {
+      font-size: .75rem; color: rgba(255,255,255,.55); flex: 1; line-height: 1.3;
+    }
+    .bp-more {
+      font-size: .7rem; color: rgba(255,255,255,.25);
+      text-align: center; padding-top: 6px; letter-spacing: .04em;
+    }
+
+    /* ── RIGHT PANEL — form ── */
+    .auth-form-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 40px;
+      background: var(--white);
+    }
+
+    .auth-form-wrap {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .auth-form-header { margin-bottom: 32px; }
+    .auth-form-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem; color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .auth-form-sub {
+      font-size: .875rem; color: var(--text-muted);
+    }
+    .auth-form-sub a {
+      color: var(--violet); font-weight: 500;
+    }
+    .auth-form-sub a:hover { text-decoration: underline; }
+
+    /* Google SSO */
+    .sso-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 11px 20px;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif; font-size: .875rem; font-weight: 500;
+      color: var(--text-primary); cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+      margin-bottom: 24px;
+    }
+    .sso-btn:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-sm);
+    }
+    .sso-icon {
+      width: 18px; height: 18px; flex-shrink: 0;
+    }
+
+    /* divider */
+    .auth-divider {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 24px;
+    }
+    .auth-divider-line { flex: 1; height: 1px; background: var(--border); }
+    .auth-divider-text {
+      font-size: .75rem; color: var(--text-muted); font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* form fields */
+    .field { margin-bottom: 18px; }
+    .field-label {
+      display: block; font-size: .8rem; font-weight: 600;
+      color: var(--text-secondary); margin-bottom: 6px;
+    }
+    .field-input-wrap { position: relative; }
+    .field-input {
+      width: 100%; height: 44px;
+      padding: 0 14px 0 40px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif; font-size: .875rem;
+      color: var(--text-primary); background: var(--white);
+      transition: border-color .15s, box-shadow .15s;
+      outline: none;
+    }
+    .field-input:focus {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px var(--violet-light);
+    }
+    .field-input.error { border-color: #EF4444; }
+    .field-input.error:focus { box-shadow: 0 0 0 3px #FEE2E2; }
+    .field-icon {
+      position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+      font-size: 16px; color: var(--text-muted); pointer-events: none;
+    }
+    .field-toggle {
+      position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+      font-size: 16px; color: var(--text-muted); cursor: pointer;
+      background: none; border: none; padding: 0;
+      transition: color .15s;
+    }
+    .field-toggle:hover { color: var(--text-secondary); }
+    .field-error {
+      font-size: .75rem; color: #EF4444; margin-top: 5px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .field-error i { font-size: 13px; }
+
+    /* forgot password */
+    .field-row {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 6px;
+    }
+    .forgot-link {
+      font-size: .78rem; color: var(--violet); font-weight: 500;
+    }
+    .forgot-link:hover { text-decoration: underline; }
+
+    /* remember me */
+    .remember-row {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 24px;
+    }
+    .remember-check {
+      width: 16px; height: 16px; border-radius: 4px;
+      border: 1.5px solid var(--border); cursor: pointer;
+      accent-color: var(--violet);
+    }
+    .remember-label {
+      font-size: .82rem; color: var(--text-muted); cursor: pointer;
+    }
+
+    /* submit */
+    .submit-btn {
+      width: 100%; height: 46px;
+      background: var(--violet); color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif; font-size: .9rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 20px;
+    }
+    .submit-btn:hover { background: var(--violet-mid); }
+    .submit-btn:disabled {
+      opacity: .55; cursor: not-allowed;
+    }
+    .submit-btn.loading .btn-text { display: none; }
+    .submit-btn .spinner {
+      display: none; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+    .submit-btn.loading .spinner { display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* error banner */
+    .auth-error {
+      display: none;
+      background: #FEF2F2; border: 1px solid #FECACA;
+      border-radius: var(--radius-sm); padding: 11px 14px;
+      font-size: .82rem; color: #991B1B;
+      display: flex; align-items: flex-start; gap: 8px;
+      margin-bottom: 18px;
+    }
+    .auth-error.hidden { display: none; }
+    .auth-error i { flex-shrink: 0; margin-top: 1px; }
+
+    /* signup prompt */
+    .auth-switch {
+      text-align: center; font-size: .82rem; color: var(--text-muted);
+    }
+    .auth-switch a { color: var(--violet); font-weight: 500; }
+    .auth-switch a:hover { text-decoration: underline; }
+
+    /* form bottom — legal */
+    .auth-legal {
+      margin-top: 32px; padding-top: 24px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: .72rem; color: var(--text-muted); line-height: 1.6;
+    }
+    .auth-legal a { color: var(--text-muted); text-decoration: underline; }
+    .auth-legal a:hover { color: var(--text-secondary); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .auth-shell { grid-template-columns: 1fr; }
+      .auth-brand { display: none; }
+      .auth-form-panel { min-height: 100vh; padding: 32px 24px; }
+      .auth-form-panel::before {
+        content: '';
+        display: block;
+        margin-bottom: 32px;
+      }
+    }
+    @media (max-width: 480px) {
+      .auth-form-panel { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-shell">
+
+  <!-- LEFT — brand panel -->
+  <div class="auth-brand">
+
+    <div class="brand-top">
+      <a href="https://karismind.com" class="brand-back">
+        <i class="ti ti-arrow-left" style="font-size:13px"></i>
+        Karis Mind
+      </a>
+      <span class="brand-sep">›</span>
+      <span class="brand-name">
+        <span class="brand-name-dot"></span>
+        Cascade
+      </span>
+    </div>
+
+    <div class="brand-body">
+      <div class="brand-eyebrow">Workplan execution engine</div>
+      <h1 class="brand-headline">
+        Plans mean nothing<br>without <em>execution.</em>
+      </h1>
+      <p class="brand-sub">
+        Cascade turns your strategic and annual workplans into granular,
+        assignable activities — structured for any performance management system.
+      </p>
+
+      <div class="brand-preview">
+        <div class="bp-label">Live cascade · LpWSC FY-2026</div>
+        <div class="bp-chain">
+          <div class="bp-node n0">
+            <span class="bp-lbl">Corporate</span>
+            <span class="bp-text">Cost recovery ratio ≥ 100%</span>
+          </div>
+          <div class="bp-node n1">
+            <span class="bp-lbl">Operations</span>
+            <span class="bp-text">Billing efficiency → ≥85%</span>
+          </div>
+          <div class="bp-node n2">
+            <span class="bp-lbl">Staffing</span>
+            <span class="bp-text">Staff efficiency index improved</span>
+          </div>
+          <div class="bp-node n3">
+            <span class="bp-lbl">Rules</span>
+            <span class="bp-text">Procurement policies updated</span>
+          </div>
+        </div>
+        <div class="bp-more">+ 2 more levels · integrity 5/5 ✓</div>
+      </div>
+    </div>
+
+  </div><!-- end brand panel -->
+
+  <!-- RIGHT — form panel -->
+  <div class="auth-form-panel">
+    <div class="auth-form-wrap">
+
+      <div class="auth-form-header">
+        <h2 class="auth-form-title">Welcome back</h2>
+        <p class="auth-form-sub">
+          Don't have an account?
+          <a href="signup.html">Start free →</a>
+        </p>
+      </div>
+
+      <!-- SSO -->
+      <button class="sso-btn" type="button" onclick="handleSSO()">
+        <svg class="sso-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+          <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+          <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="auth-divider">
+        <div class="auth-divider-line"></div>
+        <span class="auth-divider-text">or sign in with email</span>
+        <div class="auth-divider-line"></div>
+      </div>
+
+      <!-- Error banner — hidden by default -->
+      <div class="auth-error hidden" id="auth-error" role="alert">
+        <i class="ti ti-alert-circle"></i>
+        <span id="auth-error-text">Incorrect email or password. Please try again.</span>
+      </div>
+
+      <!-- Form -->
+      <form id="login-form" novalidate>
+
+        <div class="field">
+          <label class="field-label" for="email">Email address</label>
+          <div class="field-input-wrap">
+            <i class="ti ti-mail field-icon" aria-hidden="true"></i>
+            <input
+              class="field-input"
+              type="email"
+              id="email"
+              name="email"
+              placeholder="you@organisation.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+          <div class="field-error hidden" id="email-error">
+            <i class="ti ti-alert-circle"></i>
+            <span>Please enter a valid email address.</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-row">
+            <label class="field-label" for="password" style="margin-bottom:0">Password</label>
+            <a href="forgot.html" class="forgot-link">Forgot password?</a>
+          </div>
+          <div class="field-input-wrap">
+            <i class="ti ti-lock field-icon" aria-hidden="true"></i>
+            <input
+              class="field-input"
+              type="password"
+              id="password"
+              name="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              class="field-toggle"
+              id="pw-toggle"
+              aria-label="Show password"
+            >
+              <i class="ti ti-eye" id="pw-toggle-icon" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="field-error hidden" id="password-error">
+            <i class="ti ti-alert-circle"></i>
+            <span>Password is required.</span>
+          </div>
+        </div>
+
+        <div class="remember-row">
+          <input type="checkbox" class="remember-check" id="remember" name="remember" />
+          <label class="remember-label" for="remember">Keep me signed in for 30 days</label>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">
+          <span class="btn-text">Sign in to Cascade</span>
+          <div class="spinner" aria-hidden="true"></div>
+        </button>
+
+      </form>
+
+      <div class="auth-switch">
+        New to Karis Mind? <a href="signup.html">Create a free account →</a>
+      </div>
+
+      <div class="auth-legal">
+        By signing in you agree to our
+        <a href="https://karismind.com/terms" target="_blank">Terms of Service</a>
+        and
+        <a href="https://karismind.com/privacy" target="_blank">Privacy Policy</a>.
+      </div>
+
+    </div>
+  </div><!-- end form panel -->
+
+</div><!-- end auth-shell -->
+
+<script>
+  /* ── Password visibility toggle ── */
+  const pwInput  = document.getElementById('password');
+  const pwToggle = document.getElementById('pw-toggle');
+  const pwIcon   = document.getElementById('pw-toggle-icon');
+
+  pwToggle.addEventListener('click', () => {
+    const show = pwInput.type === 'password';
+    pwInput.type = show ? 'text' : 'password';
+    pwIcon.className = show ? 'ti ti-eye-off' : 'ti ti-eye';
+    pwToggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  });
+
+  /* ── Inline validation ── */
+  function showError(fieldId, errorId) {
+    document.getElementById(fieldId).classList.add('error');
+    document.getElementById(errorId).classList.remove('hidden');
+  }
+  function clearError(fieldId, errorId) {
+    document.getElementById(fieldId).classList.remove('error');
+    document.getElementById(errorId).classList.add('hidden');
+  }
+
+  document.getElementById('email').addEventListener('input', function () {
+    if (this.value.length > 0) clearError('email', 'email-error');
+  });
+  document.getElementById('password').addEventListener('input', function () {
+    if (this.value.length > 0) clearError('password', 'password-error');
+  });
+
+  /* ── Form submit ── */
+  document.getElementById('login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    let valid = true;
+
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const errorBanner = document.getElementById('auth-error');
+
+    errorBanner.classList.add('hidden');
+
+    /* basic client-side validation */
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showError('email', 'email-error'); valid = false;
+    }
+    if (!password) {
+      showError('password', 'password-error'); valid = false;
+    }
+    if (!valid) return;
+
+    /* simulate loading state */
+    const btn = document.getElementById('submit-btn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    /* simulate auth — replace with real API call */
+    setTimeout(() => {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+
+      /* on success → redirect to app */
+      /* window.location.href = 'app/index.html'; */
+
+      /* demo: show error state */
+      errorBanner.classList.remove('hidden');
+    }, 1400);
+  });
+
+  /* ── Google SSO placeholder ── */
+  function handleSSO() {
+    /* wire up to your OAuth provider */
+    alert('Google sign-in — wire up to your OAuth provider.');
+  }
+</script>
+
+</body>
+</html>

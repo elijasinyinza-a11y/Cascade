@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Start free — Karis Cascade</title>
+  <meta name="description" content="Create your free Karis Cascade account. No credit card required." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="assets/css/karis-cascade.css" />
+  <style>
+    body { background: var(--page-bg); }
+
+    /* ── SHELL — 3 columns: brand | form | plan picker ── */
+    .auth-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 380px 1fr 300px;
+    }
+
+    /* ── LEFT — brand (same pattern as login) ── */
+    .auth-brand {
+      background: var(--navy);
+      display: flex; flex-direction: column;
+      padding: 48px; position: relative; overflow: hidden;
+    }
+    .auth-brand::before {
+      content:''; position:absolute; top:-120px; left:-120px;
+      width:440px; height:440px; border-radius:50%;
+      background:radial-gradient(circle,rgba(124,92,191,.22) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .auth-brand::after {
+      content:''; position:absolute; bottom:-80px; right:-80px;
+      width:300px; height:300px; border-radius:50%;
+      background:radial-gradient(circle,rgba(29,158,117,.14) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .brand-top {
+      display:flex; align-items:center; gap:8px;
+      margin-bottom:auto; position:relative; z-index:1;
+    }
+    .brand-back {
+      font-size:12px; color:#475569; font-weight:500;
+      display:flex; align-items:center; gap:5px; transition:color .15s;
+    }
+    .brand-back:hover { color:#94A3B8; }
+    .brand-sep  { color:#1E3A64; }
+    .brand-name {
+      font-size:13px; font-weight:600; color:#fff;
+      display:flex; align-items:center; gap:6px;
+    }
+    .brand-name-dot { width:7px; height:7px; border-radius:50%; background:var(--violet); }
+
+    .brand-body { margin-top:auto; position:relative; z-index:1; }
+    .brand-eyebrow {
+      font-size:.68rem; font-weight:700; letter-spacing:.1em;
+      text-transform:uppercase; color:var(--violet); margin-bottom:14px;
+    }
+    .brand-headline {
+      font-family:'DM Serif Display',serif;
+      font-size:clamp(1.5rem,2.5vw,2rem);
+      color:#fff; line-height:1.2; margin-bottom:14px;
+    }
+    .brand-headline em { font-style:italic; color:#C4B0E8; }
+    .brand-sub {
+      font-size:.875rem; color:rgba(255,255,255,.48);
+      line-height:1.65; margin-bottom:32px; max-width:300px;
+    }
+
+    /* value props */
+    .brand-props { display:flex; flex-direction:column; gap:12px; }
+    .brand-prop {
+      display:flex; align-items:flex-start; gap:10px;
+    }
+    .bp-icon {
+      width:28px; height:28px; border-radius:6px; flex-shrink:0;
+      background:rgba(124,92,191,.2); border:1px solid rgba(124,92,191,.3);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .bp-icon i { font-size:14px; color:#C4B0E8; }
+    .bp-text-wrap {}
+    .bp-title { font-size:.82rem; font-weight:600; color:rgba(255,255,255,.85); margin-bottom:1px; }
+    .bp-desc  { font-size:.75rem; color:rgba(255,255,255,.38); line-height:1.45; }
+
+    /* ── CENTRE — form ── */
+    .auth-form-panel {
+      display:flex; flex-direction:column;
+      justify-content:center; align-items:center;
+      padding:48px 40px;
+      background:var(--white);
+      border-left:1px solid var(--border);
+      border-right:1px solid var(--border);
+    }
+    .auth-form-wrap { width:100%; max-width:420px; }
+
+    .auth-form-header { margin-bottom:28px; }
+    .auth-form-title {
+      font-family:'DM Serif Display',serif;
+      font-size:1.75rem; color:var(--text-primary); margin-bottom:5px;
+    }
+    .auth-form-sub { font-size:.875rem; color:var(--text-muted); }
+    .auth-form-sub a { color:var(--violet); font-weight:500; }
+    .auth-form-sub a:hover { text-decoration:underline; }
+
+    /* SSO */
+    .sso-btn {
+      width:100%; display:flex; align-items:center; justify-content:center;
+      gap:10px; padding:11px 20px;
+      background:var(--white); border:1.5px solid var(--border);
+      border-radius:var(--radius-sm);
+      font-family:'Inter',sans-serif; font-size:.875rem; font-weight:500;
+      color:var(--text-primary); cursor:pointer;
+      transition:border-color .15s, box-shadow .15s;
+      margin-bottom:22px;
+    }
+    .sso-btn:hover { border-color:var(--border-strong); box-shadow:var(--shadow-sm); }
+    .sso-icon { width:18px; height:18px; flex-shrink:0; }
+
+    /* divider */
+    .auth-divider {
+      display:flex; align-items:center; gap:14px; margin-bottom:22px;
+    }
+    .auth-divider-line { flex:1; height:1px; background:var(--border); }
+    .auth-divider-text { font-size:.75rem; color:var(--text-muted); font-weight:500; white-space:nowrap; }
+
+    /* step indicator */
+    .step-indicator {
+      display:flex; align-items:center; gap:0;
+      margin-bottom:24px;
+    }
+    .step-item {
+      display:flex; align-items:center; gap:6px;
+      font-size:.75rem; font-weight:600; color:var(--text-muted);
+    }
+    .step-item.active { color:var(--violet); }
+    .step-item.done   { color:var(--teal); }
+    .step-num {
+      width:22px; height:22px; border-radius:50%;
+      border:1.5px solid var(--border-strong);
+      display:flex; align-items:center; justify-content:center;
+      font-size:.65rem; font-weight:700; background:var(--white);
+      flex-shrink:0;
+    }
+    .step-item.active .step-num { border-color:var(--violet); color:var(--violet); background:var(--violet-light); }
+    .step-item.done   .step-num { border-color:var(--teal); background:var(--teal); color:#fff; }
+    .step-line { flex:1; height:1.5px; background:var(--border); margin:0 6px; min-width:20px; }
+    .step-line.done { background:var(--teal); }
+
+    /* fields */
+    .field { margin-bottom:16px; }
+    .field-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+    .field-label {
+      display:block; font-size:.78rem; font-weight:600;
+      color:var(--text-secondary); margin-bottom:5px;
+    }
+    .field-label .optional {
+      font-weight:400; color:var(--text-muted); font-size:.72rem; margin-left:4px;
+    }
+    .field-input-wrap { position:relative; }
+    .field-input {
+      width:100%; height:42px; padding:0 14px 0 40px;
+      border:1.5px solid var(--border); border-radius:var(--radius-sm);
+      font-family:'Inter',sans-serif; font-size:.875rem;
+      color:var(--text-primary); background:var(--white);
+      transition:border-color .15s, box-shadow .15s; outline:none;
+    }
+    .field-input.no-icon { padding-left:14px; }
+    .field-input:focus {
+      border-color:var(--violet);
+      box-shadow:0 0 0 3px var(--violet-light);
+    }
+    .field-input.valid { border-color:var(--teal); }
+    .field-input.error { border-color:#EF4444; }
+    .field-input.error:focus { box-shadow:0 0 0 3px #FEE2E2; }
+    .field-icon {
+      position:absolute; left:13px; top:50%; transform:translateY(-50%);
+      font-size:15px; color:var(--text-muted); pointer-events:none;
+    }
+    .field-valid-icon {
+      position:absolute; right:12px; top:50%; transform:translateY(-50%);
+      font-size:15px; color:var(--teal); display:none;
+    }
+    .field-input.valid ~ .field-valid-icon { display:block; }
+    .field-toggle {
+      position:absolute; right:13px; top:50%; transform:translateY(-50%);
+      font-size:15px; color:var(--text-muted); cursor:pointer;
+      background:none; border:none; padding:0; transition:color .15s;
+    }
+    .field-toggle:hover { color:var(--text-secondary); }
+    .field-error {
+      font-size:.72rem; color:#EF4444; margin-top:4px;
+      display:none; align-items:center; gap:4px;
+    }
+    .field-error.show { display:flex; }
+    .field-hint {
+      font-size:.72rem; color:var(--text-muted); margin-top:4px; line-height:1.4;
+    }
+
+    /* password strength */
+    .pw-strength { margin-top:6px; }
+    .pw-strength-bar {
+      display:flex; gap:3px; margin-bottom:4px;
+    }
+    .pw-bar-seg {
+      flex:1; height:3px; border-radius:99px;
+      background:var(--border); transition:background .3s;
+    }
+    .pw-bar-seg.weak   { background:#EF4444; }
+    .pw-bar-seg.fair   { background:#F59E0B; }
+    .pw-bar-seg.strong { background:var(--teal); }
+    .pw-strength-label {
+      font-size:.7rem; color:var(--text-muted);
+    }
+
+    /* select */
+    .field-select {
+      width:100%; height:42px; padding:0 14px;
+      border:1.5px solid var(--border); border-radius:var(--radius-sm);
+      font-family:'Inter',sans-serif; font-size:.875rem;
+      color:var(--text-primary); background:var(--white);
+      outline:none; transition:border-color .15s, box-shadow .15s;
+      appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;
+      background-position:right 14px center;
+    }
+    .field-select:focus { border-color:var(--violet); box-shadow:0 0 0 3px var(--violet-light); }
+
+    /* terms */
+    .terms-row {
+      display:flex; align-items:flex-start; gap:9px;
+      margin-bottom:20px;
+    }
+    .terms-check {
+      width:16px; height:16px; border-radius:4px; flex-shrink:0;
+      margin-top:2px; accent-color:var(--violet); cursor:pointer;
+    }
+    .terms-label {
+      font-size:.8rem; color:var(--text-muted); line-height:1.5; cursor:pointer;
+    }
+    .terms-label a { color:var(--violet); font-weight:500; }
+    .terms-label a:hover { text-decoration:underline; }
+
+    /* submit */
+    .submit-btn {
+      width:100%; height:46px;
+      background:var(--violet); color:#fff; border:none;
+      border-radius:var(--radius-sm);
+      font-family:'Inter',sans-serif; font-size:.9rem; font-weight:600;
+      cursor:pointer; transition:background .15s;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      margin-bottom:18px;
+    }
+    .submit-btn:hover  { background:var(--violet-mid); }
+    .submit-btn:disabled { opacity:.5; cursor:not-allowed; }
+    .submit-btn .spinner {
+      display:none; width:18px; height:18px;
+      border:2px solid rgba(255,255,255,.3); border-top-color:#fff;
+      border-radius:50%; animation:spin .6s linear infinite;
+    }
+    .submit-btn.loading .btn-text  { display:none; }
+    .submit-btn.loading .spinner   { display:block; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .auth-switch {
+      text-align:center; font-size:.82rem; color:var(--text-muted);
+    }
+    .auth-switch a { color:var(--violet); font-weight:500; }
+    .auth-switch a:hover { text-decoration:underline; }
+
+    .auth-legal {
+      margin-top:28px; padding-top:20px;
+      border-top:1px solid var(--border);
+      text-align:center; font-size:.7rem; color:var(--text-muted); line-height:1.6;
+    }
+    .auth-legal a { color:var(--text-muted); text-decoration:underline; }
+    .auth-legal a:hover { color:var(--text-secondary); }
+
+    /* ── RIGHT — plan picker ── */
+    .plan-picker {
+      background:var(--page-bg); padding:48px 28px;
+      display:flex; flex-direction:column;
+      border-left:1px solid var(--border);
+      overflow-y:auto;
+    }
+    .pp-label {
+      font-size:.68rem; font-weight:700; letter-spacing:.1em;
+      text-transform:uppercase; color:var(--text-muted); margin-bottom:16px;
+    }
+    .plan-card {
+      background:var(--white); border:1.5px solid var(--border);
+      border-radius:var(--radius-md); padding:18px 16px;
+      cursor:pointer; margin-bottom:10px; transition:all .15s;
+      position:relative;
+    }
+    .plan-card:hover { border-color:var(--violet); }
+    .plan-card.selected {
+      border-color:var(--violet);
+      box-shadow:0 0 0 3px var(--violet-light);
+    }
+    .plan-card.featured-plan { background:var(--navy); border-color:var(--navy); }
+    .plan-card.featured-plan:hover { border-color:var(--violet-mid); }
+    .plan-card.featured-plan.selected { box-shadow:0 0 0 3px var(--violet-light); border-color:var(--violet); }
+
+    .pc-radio {
+      position:absolute; top:16px; right:16px;
+      width:16px; height:16px; border-radius:50%;
+      border:1.5px solid var(--border-strong); background:var(--white);
+      display:flex; align-items:center; justify-content:center;
+      transition:all .15s;
+    }
+    .plan-card.selected .pc-radio { border-color:var(--violet); background:var(--violet); }
+    .plan-card.selected .pc-radio::after {
+      content:''; width:6px; height:6px; border-radius:50%; background:#fff;
+    }
+    .plan-card.featured-plan .pc-radio { border-color:rgba(255,255,255,.25); background:rgba(255,255,255,.1); }
+    .plan-card.featured-plan.selected .pc-radio { border-color:var(--violet); background:var(--violet); }
+
+    .pc-name {
+      font-size:.68rem; font-weight:700; letter-spacing:.1em;
+      text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;
+    }
+    .plan-card.featured-plan .pc-name { color:rgba(255,255,255,.35); }
+    .pc-price {
+      font-family:'DM Serif Display',serif; font-size:1.5rem;
+      color:var(--text-primary); margin-bottom:4px; line-height:1;
+    }
+    .plan-card.featured-plan .pc-price { color:#fff; }
+    .pc-sub { font-size:.72rem; color:var(--text-muted); margin-bottom:12px; }
+    .plan-card.featured-plan .pc-sub { color:rgba(255,255,255,.4); }
+    .pc-features { list-style:none; }
+    .pc-features li {
+      display:flex; align-items:flex-start; gap:7px;
+      font-size:.75rem; color:var(--text-muted);
+      padding:4px 0; line-height:1.4;
+    }
+    .plan-card.featured-plan .pc-features li { color:rgba(255,255,255,.55); }
+    .pc-check { color:var(--violet); font-size:12px; flex-shrink:0; margin-top:2px; }
+    .plan-card.featured-plan .pc-check { color:var(--cyan); }
+    .pc-badge {
+      position:absolute; top:-1px; left:16px;
+      font-size:.62rem; font-weight:700; letter-spacing:.06em;
+      text-transform:uppercase; background:var(--violet); color:#fff;
+      padding:2px 8px; border-radius:0 0 6px 6px;
+    }
+
+    .pp-note {
+      font-size:.72rem; color:var(--text-muted);
+      text-align:center; margin-top:8px; line-height:1.5;
+    }
+    .pp-note a { color:var(--violet); font-weight:500; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:1100px) {
+      .auth-shell { grid-template-columns:320px 1fr 260px; }
+    }
+    @media (max-width:900px) {
+      .auth-shell { grid-template-columns:1fr; }
+      .auth-brand, .plan-picker { display:none; }
+      .auth-form-panel { min-height:100vh; border:none; padding:32px 24px; }
+    }
+    @media (max-width:480px) {
+      .auth-form-panel { padding:28px 18px; }
+      .field-row-2 { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-shell">
+
+  <!-- LEFT — brand -->
+  <div class="auth-brand">
+    <div class="brand-top">
+      <a href="https://karismind.com" class="brand-back">
+        <i class="ti ti-arrow-left" style="font-size:13px"></i>
+        Karis Mind
+      </a>
+      <span class="brand-sep">›</span>
+      <span class="brand-name">
+        <span class="brand-name-dot"></span>
+        Cascade
+      </span>
+    </div>
+    <div class="brand-body">
+      <div class="brand-eyebrow">Start free today</div>
+      <h1 class="brand-headline">
+        Your workplan.<br><em>Finally executed.</em>
+      </h1>
+      <p class="brand-sub">
+        Join organisations across Africa and beyond using Cascade
+        to turn annual workplans into the work that actually gets done.
+      </p>
+      <div class="brand-props">
+        <div class="brand-prop">
+          <div class="bp-icon"><i class="ti ti-upload"></i></div>
+          <div class="bp-text-wrap">
+            <div class="bp-title">Works with any format</div>
+            <div class="bp-desc">PDF, Word, Excel, or just type a goal. No special template required.</div>
+          </div>
+        </div>
+        <div class="brand-prop">
+          <div class="bp-icon"><i class="ti ti-git-branch"></i></div>
+          <div class="bp-text-wrap">
+            <div class="bp-title">Six-level cascade in minutes</div>
+            <div class="bp-desc">From the boardroom to daily habits — every level gets a KPI, owner, and tasks.</div>
+          </div>
+        </div>
+        <div class="brand-prop">
+          <div class="bp-icon"><i class="ti ti-shield-check"></i></div>
+          <div class="bp-text-wrap">
+            <div class="bp-title">Integrity check on every output</div>
+            <div class="bp-desc">Cascade flags broken chains before you export. No more disconnected plans.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTRE — form -->
+  <div class="auth-form-panel">
+    <div class="auth-form-wrap">
+
+      <div class="auth-form-header">
+        <h2 class="auth-form-title">Create your account</h2>
+        <p class="auth-form-sub">
+          Already have an account? <a href="login.html">Sign in →</a>
+        </p>
+      </div>
+
+      <!-- SSO -->
+      <button class="sso-btn" type="button" onclick="handleSSO()">
+        <svg class="sso-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+          <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+          <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="auth-divider">
+        <div class="auth-divider-line"></div>
+        <span class="auth-divider-text">or sign up with email</span>
+        <div class="auth-divider-line"></div>
+      </div>
+
+      <!-- Step indicator -->
+      <div class="step-indicator" id="step-indicator" role="list" aria-label="Sign up steps">
+        <div class="step-item active" id="si-0" role="listitem">
+          <div class="step-num">1</div>
+          <span>You</span>
+        </div>
+        <div class="step-line" id="sl-0"></div>
+        <div class="step-item" id="si-1" role="listitem">
+          <div class="step-num">2</div>
+          <span>Organisation</span>
+        </div>
+        <div class="step-line" id="sl-1"></div>
+        <div class="step-item" id="si-2" role="listitem">
+          <div class="step-num">3</div>
+          <span>Done</span>
+        </div>
+      </div>
+
+      <form id="signup-form" novalidate>
+
+        <!-- ── STEP 1 — personal details ── -->
+        <div id="step-1">
+          <div class="field-row-2">
+            <div class="field">
+              <label class="field-label" for="first-name">First name</label>
+              <div class="field-input-wrap">
+                <i class="ti ti-user field-icon"></i>
+                <input class="field-input" type="text" id="first-name" name="first_name"
+                  placeholder="Thandiwe" autocomplete="given-name" required />
+                <i class="ti ti-circle-check field-valid-icon"></i>
+              </div>
+              <div class="field-error" id="first-name-error">
+                <i class="ti ti-alert-circle"></i> First name is required.
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="last-name">Last name</label>
+              <div class="field-input-wrap">
+                <i class="ti ti-user field-icon"></i>
+                <input class="field-input" type="text" id="last-name" name="last_name"
+                  placeholder="Mwansa" autocomplete="family-name" required />
+                <i class="ti ti-circle-check field-valid-icon"></i>
+              </div>
+              <div class="field-error" id="last-name-error">
+                <i class="ti ti-alert-circle"></i> Last name is required.
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="email">Work email</label>
+            <div class="field-input-wrap">
+              <i class="ti ti-mail field-icon"></i>
+              <input class="field-input" type="email" id="email" name="email"
+                placeholder="you@organisation.com" autocomplete="email" required />
+              <i class="ti ti-circle-check field-valid-icon"></i>
+            </div>
+            <div class="field-error" id="email-error">
+              <i class="ti ti-alert-circle"></i> Please enter a valid email address.
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="password">Password</label>
+            <div class="field-input-wrap">
+              <i class="ti ti-lock field-icon"></i>
+              <input class="field-input" type="password" id="password" name="password"
+                placeholder="Min. 8 characters" autocomplete="new-password"
+                required oninput="checkPasswordStrength(this.value)" />
+              <button type="button" class="field-toggle" id="pw-toggle" aria-label="Show password">
+                <i class="ti ti-eye" id="pw-icon"></i>
+              </button>
+            </div>
+            <div class="pw-strength" id="pw-strength" style="display:none">
+              <div class="pw-strength-bar">
+                <div class="pw-bar-seg" id="ps0"></div>
+                <div class="pw-bar-seg" id="ps1"></div>
+                <div class="pw-bar-seg" id="ps2"></div>
+                <div class="pw-bar-seg" id="ps3"></div>
+              </div>
+              <span class="pw-strength-label" id="ps-label"></span>
+            </div>
+            <div class="field-error" id="password-error">
+              <i class="ti ti-alert-circle"></i> Password must be at least 8 characters.
+            </div>
+          </div>
+
+          <button type="button" class="submit-btn" id="next-btn" onclick="goToStep2()">
+            <span class="btn-text">Continue <i class="ti ti-arrow-right" style="font-size:14px"></i></span>
+            <div class="spinner"></div>
+          </button>
+        </div>
+
+        <!-- ── STEP 2 — organisation ── -->
+        <div id="step-2" style="display:none">
+          <div class="field">
+            <label class="field-label" for="org-name">Organisation name</label>
+            <div class="field-input-wrap">
+              <i class="ti ti-building field-icon"></i>
+              <input class="field-input" type="text" id="org-name" name="org_name"
+                placeholder="Luapula Water & Sanitation Co." autocomplete="organization" />
+              <i class="ti ti-circle-check field-valid-icon"></i>
+            </div>
+            <div class="field-hint">Used to label your cascade sessions. Can be updated later.</div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="your-role">Your role</label>
+            <div class="field-input-wrap">
+              <i class="ti ti-id-badge field-icon"></i>
+              <input class="field-input" type="text" id="your-role" name="role"
+                placeholder="e.g. Planning Manager, HR Director, MD" />
+            </div>
+            <div class="field-hint">Helps Cascade position you in the chain when assigning owners.</div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="sector">
+              Sector <span class="optional">(optional)</span>
+            </label>
+            <select class="field-select" id="sector" name="sector">
+              <option value="">Select your sector</option>
+              <option value="water">Water and sanitation</option>
+              <option value="mining">Mining and extractives</option>
+              <option value="finance">Financial services</option>
+              <option value="health">Health</option>
+              <option value="education">Education</option>
+              <option value="govt">Government / public sector</option>
+              <option value="ngo">NGO / development</option>
+              <option value="energy">Energy and utilities</option>
+              <option value="agri">Agriculture</option>
+              <option value="other">Other</option>
+            </select>
+            <div class="field-hint">Used to generate sector-relevant cascade examples.</div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="team-size">
+              Team size <span class="optional">(optional)</span>
+            </label>
+            <select class="field-select" id="team-size" name="team_size">
+              <option value="">Select team size</option>
+              <option value="1">Just me</option>
+              <option value="2-10">2–10 people</option>
+              <option value="11-50">11–50 people</option>
+              <option value="51-200">51–200 people</option>
+              <option value="200+">200+ people</option>
+            </select>
+          </div>
+
+          <div class="terms-row">
+            <input type="checkbox" class="terms-check" id="terms" name="terms" required />
+            <label class="terms-label" for="terms">
+              I agree to the Karis Mind
+              <a href="https://karismind.com/terms" target="_blank">Terms of Service</a>
+              and
+              <a href="https://karismind.com/privacy" target="_blank">Privacy Policy</a>.
+              No spam. Unsubscribe any time.
+            </label>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submit-btn">
+            <span class="btn-text">Create free account</span>
+            <div class="spinner"></div>
+          </button>
+
+          <div style="text-align:center;margin-bottom:16px">
+            <button type="button" onclick="goToStep1()"
+              style="font-size:.78rem;color:var(--text-muted);background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px">
+              <i class="ti ti-arrow-left" style="font-size:12px"></i> Back
+            </button>
+          </div>
+        </div>
+
+      </form>
+
+      <div class="auth-switch" id="signin-link">
+        Already have an account? <a href="login.html">Sign in →</a>
+      </div>
+
+      <div class="auth-legal">
+        No credit card required · Cancel any time ·
+        PPP pricing available for qualifying markets
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT — plan picker -->
+  <div class="plan-picker">
+    <div class="pp-label">Choose your plan</div>
+
+    <div class="plan-card selected" id="pc-free" onclick="selectPlan('free')">
+      <div class="pc-radio"></div>
+      <div class="pc-name">Individual</div>
+      <div class="pc-price">Free</div>
+      <div class="pc-sub">Always free · No card</div>
+      <ul class="pc-features">
+        <li><i class="ti ti-check pc-check"></i>1 goal per session</li>
+        <li><i class="ti ti-check pc-check"></i>All 4 input types</li>
+        <li><i class="ti ti-check pc-check"></i>Cascade chain view</li>
+        <li><i class="ti ti-check pc-check"></i>PDF export</li>
+      </ul>
+    </div>
+
+    <div class="plan-card featured-plan" id="pc-pro" onclick="selectPlan('pro')">
+      <div class="pc-badge">Most popular</div>
+      <div class="pc-radio"></div>
+      <div class="pc-name">Professional</div>
+      <div class="pc-price" style="color:#fff">$38<span style="font-size:.9rem;font-weight:400;font-family:'Inter',sans-serif;color:rgba(255,255,255,.4);margin-left:3px">/mo</span></div>
+      <div class="pc-sub">14-day free trial · No card now</div>
+      <ul class="pc-features">
+        <li><i class="ti ti-check pc-check"></i>4 goals per session</li>
+        <li><i class="ti ti-check pc-check"></i>Dept KPI view</li>
+        <li><i class="ti ti-check pc-check"></i>Individual contracts</li>
+        <li><i class="ti ti-check pc-check"></i>Saved sessions</li>
+        <li><i class="ti ti-check pc-check"></i>Push to Performance</li>
+      </ul>
+    </div>
+
+    <div class="plan-card" id="pc-org" onclick="selectPlan('org')">
+      <div class="pc-radio"></div>
+      <div class="pc-name">Organisation</div>
+      <div class="pc-price">Custom</div>
+      <div class="pc-sub">10+ seats · Talk to us</div>
+      <ul class="pc-features">
+        <li><i class="ti ti-check pc-check"></i>All of Professional</li>
+        <li><i class="ti ti-check pc-check"></i>Multi-user workspace</li>
+        <li><i class="ti ti-check pc-check"></i>Org structure mapping</li>
+        <li><i class="ti ti-check pc-check"></i>SSO &amp; permissions</li>
+      </ul>
+    </div>
+
+    <p class="pp-note">
+      You can change your plan at any time. ·
+      <a href="index.html#pricing">Compare plans →</a>
+    </p>
+  </div>
+
+</div><!-- end auth-shell -->
+
+<script>
+  /* ── Plan selection ── */
+  let selectedPlan = 'free';
+  function selectPlan(plan) {
+    selectedPlan = plan;
+    ['free','pro','org'].forEach(p => {
+      document.getElementById('pc-' + p).classList.toggle('selected', p === plan);
+    });
+    /* org plan → redirect to contact */
+    if (plan === 'org') {
+      setTimeout(() => { window.location.href = 'https://karismind.com/contact'; }, 300);
+    }
+  }
+
+  /* ── Password visibility ── */
+  document.getElementById('pw-toggle').addEventListener('click', function () {
+    const pw   = document.getElementById('password');
+    const icon = document.getElementById('pw-icon');
+    const show = pw.type === 'password';
+    pw.type = show ? 'text' : 'password';
+    icon.className = show ? 'ti ti-eye-off' : 'ti ti-eye';
+    this.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  });
+
+  /* ── Password strength ── */
+  function checkPasswordStrength(val) {
+    const bar = document.getElementById('pw-strength');
+    const label = document.getElementById('ps-label');
+    bar.style.display = val.length ? 'block' : 'none';
+    const segs = [document.getElementById('ps0'), document.getElementById('ps1'),
+                  document.getElementById('ps2'), document.getElementById('ps3')];
+    segs.forEach(s => s.className = 'pw-bar-seg');
+    if (!val.length) return;
+    let score = 0;
+    if (val.length >= 8)  score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const cls   = score <= 1 ? 'weak' : score <= 2 ? 'fair' : 'strong';
+    const lbls  = ['','Weak','Fair','Strong','Very strong'];
+    for (let i = 0; i < score; i++) segs[i].classList.add(cls);
+    label.textContent = lbls[score] || '';
+    label.style.color = score <= 1 ? '#EF4444' : score <= 2 ? '#F59E0B' : 'var(--teal)';
+  }
+
+  /* ── Validation helpers ── */
+  function setError(inputId, errorId, show) {
+    const inp = document.getElementById(inputId);
+    const err = document.getElementById(errorId);
+    inp.classList.toggle('error', show);
+    inp.classList.toggle('valid', !show && inp.value.length > 0);
+    err.classList.toggle('show', show);
+  }
+  function emailValid(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+  /* real-time clear */
+  ['first-name','last-name','email','password'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', function () {
+      const errId = id + '-error';
+      if (this.value.length) setError(id, errId, false);
+    });
+  });
+
+  /* ── Step navigation ── */
+  function goToStep2() {
+    let valid = true;
+    const fn = document.getElementById('first-name').value.trim();
+    const ln = document.getElementById('last-name').value.trim();
+    const em = document.getElementById('email').value.trim();
+    const pw = document.getElementById('password').value;
+
+    if (!fn)               { setError('first-name','first-name-error',true); valid=false; }
+    if (!ln)               { setError('last-name','last-name-error',true);   valid=false; }
+    if (!emailValid(em))   { setError('email','email-error',true);           valid=false; }
+    if (pw.length < 8)     { setError('password','password-error',true);     valid=false; }
+    if (!valid) return;
+
+    document.getElementById('step-1').style.display = 'none';
+    document.getElementById('step-2').style.display = 'block';
+    document.getElementById('signin-link').style.display = 'none';
+
+    /* update step indicator */
+    const si0 = document.getElementById('si-0');
+    si0.classList.remove('active'); si0.classList.add('done');
+    si0.querySelector('.step-num').innerHTML = '<i class="ti ti-check" style="font-size:11px;color:#fff"></i>';
+    document.getElementById('sl-0').classList.add('done');
+    document.getElementById('si-1').classList.add('active');
+    document.getElementById('org-name').focus();
+  }
+
+  function goToStep1() {
+    document.getElementById('step-2').style.display = 'none';
+    document.getElementById('step-1').style.display = 'block';
+    document.getElementById('signin-link').style.display = 'block';
+    const si0 = document.getElementById('si-0');
+    si0.classList.remove('done'); si0.classList.add('active');
+    si0.querySelector('.step-num').textContent = '1';
+    document.getElementById('sl-0').classList.remove('done');
+    document.getElementById('si-1').classList.remove('active');
+  }
+
+  /* ── Form submit ── */
+  document.getElementById('signup-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!document.getElementById('terms').checked) {
+      alert('Please agree to the Terms of Service to continue.');
+      return;
+    }
+    const btn = document.getElementById('submit-btn');
+    btn.classList.add('loading'); btn.disabled = true;
+
+    /* update step indicator */
+    const si1 = document.getElementById('si-1');
+    si1.classList.remove('active'); si1.classList.add('done');
+    si1.querySelector('.step-num').innerHTML = '<i class="ti ti-check" style="font-size:11px;color:#fff"></i>';
+    document.getElementById('sl-1').classList.add('done');
+    document.getElementById('si-2').classList.add('active');
+
+    /* simulate account creation → redirect to app */
+    setTimeout(() => {
+      /* window.location.href = 'app/index.html'; */
+      btn.classList.remove('loading'); btn.disabled = false;
+      btn.querySelector('.btn-text').innerHTML = '<i class="ti ti-circle-check" style="font-size:16px"></i> Account created — redirecting…';
+      btn.style.background = 'var(--teal)';
+    }, 1600);
+  });
+
+  /* ── Google SSO ── */
+  function handleSSO() {
+    alert('Google sign-up — wire up to your OAuth provider.');
+  }
+</script>
+
+</body>
+</html>

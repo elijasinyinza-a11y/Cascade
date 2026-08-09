@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account & Settings — Karis Cascade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="../assets/css/karis-cascade.css" />
+  <style>
+    body { background: var(--page-bg); }
+
+    .app-layout {
+      display: grid;
+      grid-template-rows: 52px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── TWO-COLUMN LAYOUT ── */
+    .settings-shell {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      gap: 32px;
+      width: 100%;
+      align-items: start;
+    }
+
+    /* ── SETTINGS NAV ── */
+    .settings-nav {
+      position: sticky;
+      top: 72px;
+    }
+    .sn-label {
+      font-size: .65rem; font-weight: 700; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--text-muted);
+      padding: 0 8px; margin-bottom: 6px;
+    }
+    .sn-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 10px; border-radius: 8px; width: 100%;
+      font-family: 'Inter', sans-serif; font-size: .82rem;
+      font-weight: 500; color: var(--text-muted);
+      background: transparent; border: none; cursor: pointer;
+      text-align: left; transition: all .15s; margin-bottom: 2px;
+    }
+    .sn-item:hover { background: var(--white); color: var(--text-secondary); }
+    .sn-item.active { background: var(--white); color: var(--text-primary); font-weight: 600; }
+    .sn-item i { font-size: 16px; flex-shrink: 0; }
+    .sn-item.active i { color: var(--violet); }
+    .sn-divider { height: 1px; background: var(--border); margin: 10px 0; }
+    .sn-item.danger { color: #EF4444; }
+    .sn-item.danger:hover { background: #FEF2F2; }
+
+    /* ── SETTINGS CONTENT ── */
+    .settings-content { min-width: 0; }
+
+    .settings-panel { display: none; }
+    .settings-panel.active { display: block; }
+
+    /* section card */
+    .s-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-md); overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .s-card-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .s-card-title {
+      font-size: .9rem; font-weight: 600; color: var(--text-primary);
+    }
+    .s-card-sub {
+      font-size: .78rem; color: var(--text-muted); margin-top: 2px;
+    }
+    .s-card-body { padding: 20px; }
+
+    /* field rows */
+    .s-field {
+      display: grid; grid-template-columns: 160px 1fr auto;
+      align-items: center; gap: 16px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .s-field:last-child { border-bottom: none; padding-bottom: 0; }
+    .s-field:first-child { padding-top: 0; }
+    .sf-label {
+      font-size: .8rem; font-weight: 500; color: var(--text-secondary);
+    }
+    .sf-value {
+      font-size: .875rem; color: var(--text-primary);
+    }
+    .sf-muted {
+      font-size: .875rem; color: var(--text-muted);
+    }
+    .sf-edit {
+      font-size: .75rem; font-weight: 600; color: var(--violet);
+      background: none; border: none; cursor: pointer;
+      font-family: 'Inter', sans-serif; padding: 0;
+      white-space: nowrap; transition: opacity .15s;
+    }
+    .sf-edit:hover { opacity: .75; }
+
+    /* inline edit */
+    .sf-input {
+      width: 100%; height: 36px; padding: 0 10px;
+      border: 1.5px solid var(--violet); border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif; font-size: .875rem;
+      color: var(--text-primary); outline: none;
+      box-shadow: 0 0 0 3px var(--violet-light);
+    }
+    .sf-input-actions {
+      display: flex; gap: 5px;
+    }
+    .sf-save {
+      padding: 5px 12px; border-radius: 5px;
+      background: var(--violet); color: #fff; border: none;
+      font-family: 'Inter', sans-serif; font-size: .75rem;
+      font-weight: 600; cursor: pointer; transition: background .15s;
+    }
+    .sf-save:hover { background: var(--violet-mid); }
+    .sf-cancel {
+      padding: 5px 12px; border-radius: 5px;
+      background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border);
+      font-family: 'Inter', sans-serif; font-size: .75rem;
+      font-weight: 500; cursor: pointer;
+    }
+    .sf-cancel:hover { background: var(--page-bg); }
+
+    /* avatar row */
+    .avatar-row {
+      display: flex; align-items: center; gap: 16px;
+      padding-bottom: 16px; border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+    .avatar-lg {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: var(--navy); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; font-weight: 700; color: var(--violet);
+      flex-shrink: 0;
+    }
+    .avatar-info { flex: 1; }
+    .avatar-name { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
+    .avatar-email { font-size: .82rem; color: var(--text-muted); }
+    .avatar-btn {
+      padding: 6px 14px; border-radius: 6px;
+      border: 1px solid var(--border); background: transparent;
+      font-family: 'Inter', sans-serif; font-size: .78rem;
+      font-weight: 500; color: var(--text-secondary); cursor: pointer;
+      transition: all .15s;
+    }
+    .avatar-btn:hover { border-color: var(--border-strong); background: var(--page-bg); }
+
+    /* plan card */
+    .plan-current {
+      background: var(--navy); border-radius: var(--radius-md);
+      padding: 20px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .pc-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: rgba(124,92,191,.25); display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .pc-icon i { font-size: 22px; color: #C4B0E8; }
+    .pc-body { flex: 1; }
+    .pc-plan { font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 2px; }
+    .pc-name { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 2px; }
+    .pc-detail { font-size: .78rem; color: rgba(255,255,255,.4); }
+    .pc-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+    .pc-btn {
+      padding: 7px 16px; border-radius: 6px;
+      font-family: 'Inter', sans-serif; font-size: .78rem;
+      font-weight: 600; cursor: pointer; white-space: nowrap;
+      transition: all .15s; border: none;
+    }
+    .pc-btn-upgrade { background: var(--violet); color: #fff; }
+    .pc-btn-upgrade:hover { background: var(--violet-mid); }
+    .pc-btn-manage { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.15); }
+    .pc-btn-manage:hover { background: rgba(255,255,255,.14); }
+
+    /* usage bar */
+    .usage-item { margin-bottom: 14px; }
+    .usage-item:last-child { margin-bottom: 0; }
+    .usage-top {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 5px;
+    }
+    .usage-label { font-size: .8rem; color: var(--text-secondary); font-weight: 500; }
+    .usage-val   { font-size: .78rem; color: var(--text-muted); }
+    .usage-track {
+      height: 5px; background: var(--page-bg);
+      border-radius: 99px; overflow: hidden;
+    }
+    .usage-fill {
+      height: 100%; border-radius: 99px; transition: width .5s;
+    }
+    .uf-ok   { background: var(--teal); }
+    .uf-warn { background: var(--warn); }
+    .uf-full { background: #EF4444; }
+
+    /* toggle */
+    .toggle-row {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 16px; padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .toggle-row:first-child { padding-top: 0; }
+    .tr-body { flex: 1; }
+    .tr-label { font-size: .875rem; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; }
+    .tr-desc  { font-size: .78rem; color: var(--text-muted); line-height: 1.5; }
+    .toggle {
+      position: relative; width: 40px; height: 22px; flex-shrink: 0; margin-top: 2px;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute; inset: 0; border-radius: 99px;
+      background: var(--border-strong); cursor: pointer; transition: background .2s;
+    }
+    .toggle input:checked + .toggle-track { background: var(--violet); }
+    .toggle-track::after {
+      content: ''; position: absolute;
+      left: 3px; top: 3px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .toggle input:checked + .toggle-track::after { transform: translateX(18px); }
+
+    /* connected apps */
+    .connected-app {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .connected-app:last-child { border-bottom: none; }
+    .ca-logo {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: var(--page-bg); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 18px;
+    }
+    .ca-body { flex: 1; }
+    .ca-name  { font-size: .875rem; font-weight: 500; color: var(--text-primary); margin-bottom: 1px; }
+    .ca-desc  { font-size: .75rem; color: var(--text-muted); }
+    .ca-status {
+      font-size: .72rem; font-weight: 700; padding: 2px 9px;
+      border-radius: 99px; white-space: nowrap;
+    }
+    .cas-connected { background: var(--teal-light); color: var(--teal-dark); }
+    .cas-available { background: var(--page-bg); color: var(--text-muted); border: 1px solid var(--border); }
+    .ca-action {
+      padding: 5px 12px; border-radius: 6px;
+      font-family: 'Inter', sans-serif; font-size: .75rem;
+      font-weight: 600; cursor: pointer; border: 1px solid var(--border);
+      background: transparent; color: var(--text-secondary); transition: all .15s;
+      white-space: nowrap;
+    }
+    .ca-action:hover { border-color: var(--border-strong); background: var(--page-bg); }
+    .ca-action.connect { color: var(--violet); border-color: var(--violet); }
+    .ca-action.connect:hover { background: var(--violet-light); }
+
+    /* danger zone */
+    .danger-zone {
+      background: var(--white); border: 1px solid #FECACA;
+      border-radius: var(--radius-md); padding: 20px;
+    }
+    .dz-title {
+      font-size: .9rem; font-weight: 600; color: #991B1B; margin-bottom: 14px;
+    }
+    .dz-item {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 12px 0; border-bottom: 1px solid #FEE2E2;
+    }
+    .dz-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .dz-body { flex: 1; }
+    .dz-label { font-size: .875rem; font-weight: 500; color: var(--text-primary); margin-bottom: 2px; }
+    .dz-desc  { font-size: .78rem; color: var(--text-muted); }
+    .dz-btn {
+      padding: 7px 16px; border-radius: 6px;
+      font-family: 'Inter', sans-serif; font-size: .78rem;
+      font-weight: 600; cursor: pointer; white-space: nowrap;
+      border: 1px solid #FECACA; background: transparent;
+      color: #EF4444; transition: all .15s; flex-shrink: 0;
+    }
+    .dz-btn:hover { background: #FEF2F2; border-color: #EF4444; }
+
+    /* toast */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--navy); color: #fff;
+      padding: 11px 20px; border-radius: 8px;
+      font-size: .85rem; font-weight: 500;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: var(--shadow-lg); z-index: 300;
+      transition: transform .3s ease;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast i { color: var(--teal); font-size: 16px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 720px) {
+      .settings-shell { grid-template-columns: 1fr; gap: 0; }
+      .settings-nav { position: static; display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 20px; }
+      .sn-label, .sn-divider { display: none; }
+      .sn-item { flex: 0 0 auto; padding: 7px 12px; border-radius: 99px; border: 1px solid var(--border); }
+      .sn-item.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+      .sn-item.active i { color: #C4B0E8; }
+      .s-field { grid-template-columns: 1fr; gap: 6px; }
+      .pc-actions { flex-direction: row; align-items: center; }
+    }
+    @media (max-width: 480px) {
+      .plan-current { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+  <!-- APP NAV -->
+  <nav class="app-nav" role="navigation" aria-label="Cascade app navigation">
+    <div class="app-nav-left">
+      <a href="https://karismind.com" class="back-link">
+        <i class="ti ti-arrow-left" style="font-size:12px"></i>Karis Mind
+      </a>
+      <span class="nav-sep">›</span>
+      <span class="nav-product">
+        <span class="nav-product-dot"></span>Cascade
+      </span>
+    </div>
+    <div class="app-nav-right">
+      <a href="sessions.html" class="nav-link">Sessions</a>
+      <a href="settings.html" class="nav-link" style="color:#fff;font-weight:600">Account</a>
+      <div class="nav-avatar" title="Your account">BM</div>
+    </div>
+  </nav>
+
+  <div class="settings-shell">
+
+    <!-- SETTINGS NAV -->
+    <nav class="settings-nav" aria-label="Settings navigation">
+      <div class="sn-label">Account</div>
+      <button class="sn-item active" id="sn-profile"   onclick="showPanel('profile',this)">
+        <i class="ti ti-user"         aria-hidden="true"></i>Profile
+      </button>
+      <button class="sn-item"         id="sn-plan"      onclick="showPanel('plan',this)">
+        <i class="ti ti-credit-card"  aria-hidden="true"></i>Plan &amp; billing
+      </button>
+      <button class="sn-item"         id="sn-org"       onclick="showPanel('org',this)">
+        <i class="ti ti-building"     aria-hidden="true"></i>Organisation
+      </button>
+      <div class="sn-divider"></div>
+      <div class="sn-label">Preferences</div>
+      <button class="sn-item"         id="sn-notif"     onclick="showPanel('notif',this)">
+        <i class="ti ti-bell"         aria-hidden="true"></i>Notifications
+      </button>
+      <button class="sn-item"         id="sn-integrations" onclick="showPanel('integrations',this)">
+        <i class="ti ti-plug"         aria-hidden="true"></i>Integrations
+      </button>
+      <div class="sn-divider"></div>
+      <button class="sn-item danger"  id="sn-danger"    onclick="showPanel('danger',this)">
+        <i class="ti ti-alert-triangle" aria-hidden="true"></i>Danger zone
+      </button>
+    </nav>
+
+    <!-- SETTINGS CONTENT -->
+    <div class="settings-content">
+
+      <!-- ══ PROFILE ══ -->
+      <div class="settings-panel active" id="panel-profile">
+
+        <div class="s-card">
+          <div class="s-card-header">
+            <div>
+              <div class="s-card-title">Personal details</div>
+              <div class="s-card-sub">Your name and email as they appear in Cascade</div>
+            </div>
+          </div>
+          <div class="s-card-body">
+            <div class="avatar-row">
+              <div class="avatar-lg">BM</div>
+              <div class="avatar-info">
+                <div class="avatar-name">Bwalya Mwansa</div>
+                <div class="avatar-email">b.mwansa@lpwsc.co.zm</div>
+              </div>
+              <button class="avatar-btn">Change photo</button>
+            </div>
+
+            <!-- name -->
+            <div class="s-field" id="field-name">
+              <div class="sf-label">Full name</div>
+              <div class="sf-value" id="val-name">Bwalya Mwansa</div>
+              <button class="sf-edit" onclick="editField('name')">Edit</button>
+            </div>
+            <div class="s-field" id="field-name-edit" style="display:none">
+              <div class="sf-label">Full name</div>
+              <input class="sf-input" id="input-name" value="Bwalya Mwansa" />
+              <div class="sf-input-actions">
+                <button class="sf-save"   onclick="saveField('name')">Save</button>
+                <button class="sf-cancel" onclick="cancelField('name')">Cancel</button>
+              </div>
+            </div>
+
+            <!-- email -->
+            <div class="s-field" id="field-email">
+              <div class="sf-label">Email address</div>
+              <div class="sf-value" id="val-email">b.mwansa@lpwsc.co.zm</div>
+              <button class="sf-edit" onclick="editField('email')">Edit</button>
+            </div>
+            <div class="s-field" id="field-email-edit" style="display:none">
+              <div class="sf-label">Email address</div>
+              <input class="sf-input" type="email" id="input-email" value="b.mwansa@lpwsc.co.zm" />
+              <div class="sf-input-actions">
+                <button class="sf-save"   onclick="saveField('email')">Save</button>
+                <button class="sf-cancel" onclick="cancelField('email')">Cancel</button>
+              </div>
+            </div>
+
+            <!-- position -->
+            <div class="s-field" id="field-position">
+              <div class="sf-label">Position</div>
+              <div class="sf-value" id="val-position">Planning Manager</div>
+              <button class="sf-edit" onclick="editField('position')">Edit</button>
+            </div>
+            <div class="s-field" id="field-position-edit" style="display:none">
+              <div class="sf-label">Position</div>
+              <input class="sf-input" id="input-position" value="Planning Manager" />
+              <div class="sf-input-actions">
+                <button class="sf-save"   onclick="saveField('position')">Save</button>
+                <button class="sf-cancel" onclick="cancelField('position')">Cancel</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="s-card">
+          <div class="s-card-header">
+            <div>
+              <div class="s-card-title">Password</div>
+              <div class="s-card-sub">Last changed 3 months ago</div>
+            </div>
+          </div>
+          <div class="s-card-body">
+            <div class="s-field">
+              <div class="sf-label">Password</div>
+              <div class="sf-muted">••••••••••••</div>
+              <button class="sf-edit" onclick="showToast('Password reset email sent')">Change password</button>
+            </div>
+            <div class="s-field">
+              <div class="sf-label">Two-factor auth</div>
+              <div class="sf-muted">Not enabled</div>
+              <button class="sf-edit" onclick="showToast('2FA setup — coming soon')">Enable</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="s-card">
+          <div class="s-card-header">
+            <div>
+              <div class="s-card-title">Sessions</div>
+              <div class="s-card-sub">Devices currently signed into your account</div>
+            </div>
+          </div>
+          <div class="s-card-body">
+            <div class="s-field">
+              <div class="sf-label">This device</div>
+              <div class="sf-value">Chrome · Lusaka · Active now</div>
+              <span style="font-size:.72rem;background:var(--teal-light);color:var(--teal-dark);padding:2px 8px;border-radius:99px;font-weight:600">Current</span>
+            </div>
+            <div class="s-field">
+              <div class="sf-label">Mobile</div>
+              <div class="sf-muted">Safari · Lusaka · 2 days ago</div>
+              <button class="sf-edit" style="color:#EF4444" onclick="showToast('Device signed out')">Sign out</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ PLAN & BILLING ══ -->
+      <div class="settings-panel" id="panel-plan">
+
+        <div class="plan-current">
+          <div class="pc-icon"><i class="ti ti-star" aria-hidden="true"></i></div>
+          <div class="pc-body">
+            <div class="pc-plan">Current plan</div>
+            <div class="pc-name">Individual — Free</div>
+            <div class="pc-detail">Always free · No card required · 1 goal per session</div>
+          </div>
+          <div class="pc-actions">
+            <button class="pc-btn pc-btn-upgrade" onclick="window.location.href='../signup.html'">
+              Upgrade to Professional
+            </button>
+            <button class="pc-btn pc-btn-manage" onclick="showToast('Billing portal — coming soon')">
+              Manage billing
+            </button>
+          </div>
+        </div>
+
+        <div class="s-card">
+          <div class="s-card-header">
+            <div>
+              <div class="s-card-title">Usage this month</div>
+              <div class="s-card-sub">Resets on the 1st of each month</div>
+            </div>
+          </div>
+          <div class="s-card-body">
+            <div class="usage-item">
+              <div class="usage-top">
+                <div class="usage-label">Cascade sessions</div>
+                <div class="usage-val">1 / 1 (free limit)</div>
+              </div>
+              <div class="usage-track"><div class="usage-fill uf-full" style="width:100%"></div></div>
+            </div>
+            <div class="usage-item">
+              <div class="usage-top">
+                <div class="usage-label">Goals cascaded</div>
+                <div class="usage-val">4 / 4 (free limit)</div>
+              </div>
+              <div class="usage-track"><div class="usage-fill uf-full" style="width:100%"></div></div>
+            </div>
+            <div class="usage-item">
+              <div class="usage-top">
+                <div class="usage-label">PDF exports</div>
+                <div class="usage-val">2 / 3</div>
+              </div>
+              <div class="usage-track"><div class="usage-fill uf-warn" style="width:67%"></div></div>
+            </div>
+            <div class="usage-item">
+              <div class="usage-top">
+                <div class="usage-label">Saved sessions</div>
+                <div class="usage-val">Not available on free plan</div>
+              </div>
+              <div class="usage-track"><div class="usage-fill uf-full" style="width:100%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="s-card">
+          <div class="s-card-header">
+            <div>
+              <div class="s-card-title">What you get with Professional</div>
+              <div class="s-card-sub">$38/mo · billed annually · 14-day free trial</div>
+            </div>
+            <button class="pc-btn pc-btn-upgrade" style="font-size:.8rem;padding:7px 14px" onclick="window.location.href='../signup.html'">
+              Upgrade
+            </button>
+          </div>
+          <div class="s-card-body">
+            <div class="s-field">
+              <div class="sf-label">Sessions</div>
+              <div class="sf-value">Unlimited saved sessions</div>
+              <span style="font-size:.68rem;font-weight:700;color:var(--violet)">PRO</span>
+            </div>
+            <div class="s-field">
+              <div class="sf-label">Goals per session</div>
+              <div class="sf-value">Up to 4 per session</div>
+              <span style="font-size:.68rem;font-weight:700;color:var(--violet)">PRO</span>
+            </div>
+            <div class="s-field">
+              <div class="sf-label">Views</div>
+              <div class="sf-value">Cascade · Department · Individual contract</div>
+              <span style="font-size:.68rem;font-weight:700;color:var(--violet)">PRO</span>
+            </div>
+            <div class="s-field">
+              <div class="sf-label">Push to Performance</div>
+              <div class="sf-value">Direct integration with Karis Performance</div>
+              <span style="font-size:.68rem;font-weight:700;color:var(--violet)">PRO</span>
+            </div>
+            <div class="s-field">
+              <div class="sf-label">Export formats</div>
+              <div class="sf-value">PDF, Excel, Word — unlimited</div>
+              <span style="font-size:.68rem;font-weight:700;color:var(--violet)">PRO</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ ORGANISATION ══ -->
+      <div class="settings-panel" id="panel-org">
+        <div class="s-card">
+          <div class="s-card-header">
+            <div>
+              <div class="s-card-title">Organisation profile</div>
+              <div class="s-card-sub">Used to label cascade sessions and set context defaults</div>
+            </div>
+          </div>
+          <div class="s-card-body">
+
+            <div class="s-field" id="field-org">
+              <div class="sf-label">Organisation name</div>
+              <div class="sf-value" id="val-org">Luapula Water &amp; Sanitation Co.</div>
+              <button class="sf-edit" onclick="editField('org')">Edit</button>
+            </div>
+            <div class="s-field" id="field-org-edit" style="display:none">
+              <div class="sf-label">Organisation name</div>
+              <input class="sf-input" id="input-org" value="Luapula Water &amp; Sanitation Co." />
+              <div class="sf-input-actions">
+                <button class="sf-save" onclick="saveField('org')">Save</button>
+                <button class="sf-cancel" onclick="cancelField('org')">Cancel</button>
+              </div>
+            </div>
+
+            <div class="s-field" id="field-sector">
+              <div class="sf-label">Sector</div>
+              <div class="sf-value" id="val-sector">Water and sanitation</div>
+              <button class="sf-edit" onclick="editField('sector')">Edit</button>
+            </div>
+            <div class="s-field" id="field-sector-edit" style="display:none">
+              <div class="sf-label">Sector</div>
+              <select class="sf-input" id="input-sector" style="height:36px;padding:0 10px">
+                <option>Water and sanitation</option>
+                <option>Mining and extractives</option>
+                <option>Financial services</option>
+                <option>Health</option>
+                <option>Education</option>
+                <option>Government / public sector</option>
+                <option>NGO / development</option>
+                <option>Energy and utilities</option>
+                <option>Agriculture</option>
+                <option>Other</option>
+              </select>
+              <div class="sf-input-actions">
+                <button class="sf-save" onclick="saveField('sector')">Save</button>
+                <button class="sf-cancel" onclick="cancelField('sector')">Cancel</button>
+              </div>
+            </div>
+
+            <div class="s-field">
+              <div class="sf-label">Default currency</div>
+              <div class="sf-value">ZMW — Zambian Kwacha</div>
+              <button class="sf-edit" onclick="showToast('Currency settings — coming soon')">Edit</button>
+            </div>
+            <div class="s-field">
+              <div class="sf-label">Financial year end</div>
+              <div class="sf-value">December 31</div>
+              <button class="sf-edit" onclick="showToast('FY settings — coming soon')">Edit</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ NOTIFICATIONS ══ -->
+      <div class="settings-panel" id="panel-notif">
+        <div class="s-card">
+          <div class="s-card-header">
+            <div>
+              <div class="s-card-title">Email notifications</div>
+              <div class="s-card-sub">Choose what Cascade sends to your inbox</div>
+            </div>
+          </div>
+          <div class="s-card-body">
+            <div class="toggle-row">
+              <div class="tr-body">
+                <div class="tr-label">Session summary</div>
+                <div class="tr-desc">Email a summary when a cascade is generated — includes integrity score and goals.</div>
+              </div>
+              <label class="toggle" aria-label="Session summary emails">
+                <input type="checkbox" checked onchange="showToast('Preference saved')" />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div class="tr-body">
+                <div class="tr-label">Integrity flag alerts</div>
+                <div class="tr-desc">Notify me when a cascade session has integrity flags that need resolving.</div>
+              </div>
+              <label class="toggle" aria-label="Integrity flag alerts">
+                <input type="checkbox" checked onchange="showToast('Preference saved')" />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div class="tr-body">
+                <div class="tr-label">Export ready</div>
+                <div class="tr-desc">Notify me when a PDF or Excel export is ready to download.</div>
+              </div>
+              <label class="toggle" aria-label="Export ready emails">
+                <input type="checkbox" onchange="showToast('Preference saved')" />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div class="tr-body">
+                <div class="tr-label">Product updates</div>
+                <div class="tr-desc">New features, improvements, and release notes from the Karis Mind team.</div>
+              </div>
+              <label class="toggle" aria-label="Product update emails">
+                <input type="checkbox" checked onchange="showToast('Preference saved')" />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="s-card">
+          <div class="s-card-header">
+            <div>
+              <div class="s-card-title">Cascade defaults</div>
+              <div class="s-card-sub">Behaviour settings applied to every new cascade session</div>
+            </div>
+          </div>
+          <div class="s-card-body">
+            <div class="toggle-row">
+              <div class="tr-body">
+                <div class="tr-label">Auto-run integrity check</div>
+                <div class="tr-desc">Automatically run the five-point integrity check when a cascade is generated.</div>
+              </div>
+              <label class="toggle" aria-label="Auto-run integrity check">
+                <input type="checkbox" checked onchange="showToast('Preference saved')" />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div class="tr-body">
+                <div class="tr-label">Show framework labels</div>
+                <div class="tr-desc">Show the 6P level names (Principle, Process, People…) alongside plain-English labels in the cascade chain.</div>
+              </div>
+              <label class="toggle" aria-label="Show framework labels">
+                <input type="checkbox" onchange="showToast('Preference saved')" />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div class="tr-body">
+                <div class="tr-label">Remember last input type</div>
+                <div class="tr-desc">Start new sessions with the same input type used in the previous session.</div>
+              </div>
+              <label class="toggle" aria-label="Remember last input type">
+                <input type="checkbox" checked onchange="showToast('Preference saved')" />
+                <div class="toggle-track"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ INTEGRATIONS ══ -->
+      <div class="settings-panel" id="panel-integrations">
+        <div class="s-card">
+          <div class="s-card-header">
+            <div>
+              <div class="s-card-title">Connected apps</div>
+              <div class="s-card-sub">Karis Mind products and third-party connections</div>
+            </div>
+          </div>
+          <div class="s-card-body">
+
+            <div class="connected-app">
+              <div class="ca-logo">🏅</div>
+              <div class="ca-body">
+                <div class="ca-name">Karis Performance</div>
+                <div class="ca-desc">Push cascade outputs directly into performance contracts</div>
+              </div>
+              <span class="ca-status cas-connected">Connected</span>
+              <button class="ca-action" onclick="showToast('Karis Performance disconnected')">Disconnect</button>
+            </div>
+
+            <div class="connected-app">
+              <div class="ca-logo">📊</div>
+              <div class="ca-body">
+                <div class="ca-name">Karis Strategy</div>
+                <div class="ca-desc">Import workplans directly from your Strategy sessions</div>
+              </div>
+              <span class="ca-status cas-connected">Connected</span>
+              <button class="ca-action" onclick="showToast('Karis Strategy disconnected')">Disconnect</button>
+            </div>
+
+            <div class="connected-app">
+              <div class="ca-logo">📋</div>
+              <div class="ca-body">
+                <div class="ca-name">Meeting Toolkit</div>
+                <div class="ca-desc">Attach cascade outputs to meeting action points</div>
+              </div>
+              <span class="ca-status cas-available">Not connected</span>
+              <button class="ca-action connect" onclick="showToast('Meeting Toolkit connected')">Connect</button>
+            </div>
+
+            <div class="connected-app">
+              <div class="ca-logo" style="font-size:16px">Gs</div>
+              <div class="ca-body">
+                <div class="ca-name">Google Sheets</div>
+                <div class="ca-desc">Export cascade KPI tables directly into a Google Sheet</div>
+              </div>
+              <span class="ca-status cas-available">Not connected</span>
+              <button class="ca-action connect" onclick="showToast('Google Sheets connected')">Connect</button>
+            </div>
+
+            <div class="connected-app">
+              <div class="ca-logo" style="font-size:16px">Sf</div>
+              <div class="ca-body">
+                <div class="ca-name">Salesforce</div>
+                <div class="ca-desc">Sync cascade goals with Salesforce objectives</div>
+              </div>
+              <span class="ca-status cas-available">Not connected</span>
+              <button class="ca-action connect" onclick="showToast('Salesforce — coming soon')">Coming soon</button>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="s-card">
+          <div class="s-card-header">
+            <div>
+              <div class="s-card-title">API access</div>
+              <div class="s-card-sub">For developers building on top of Karis Cascade</div>
+            </div>
+          </div>
+          <div class="s-card-body">
+            <div class="s-field">
+              <div class="sf-label">API key</div>
+              <div class="sf-muted" style="font-family:monospace;font-size:.78rem;letter-spacing:.04em">kc_••••••••••••••••••3f9a</div>
+              <button class="sf-edit" onclick="showToast('API key copied to clipboard')">Copy</button>
+            </div>
+            <div class="s-field">
+              <div class="sf-label">Webhook URL</div>
+              <div class="sf-muted">Not configured</div>
+              <button class="sf-edit" onclick="showToast('Webhook setup — coming soon')">Configure</button>
+            </div>
+            <div class="s-field">
+              <div class="sf-label">API docs</div>
+              <div class="sf-muted">cascade.karismind.com/docs</div>
+              <button class="sf-edit" onclick="showToast('Opening docs…')">View docs</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ DANGER ZONE ══ -->
+      <div class="settings-panel" id="panel-danger">
+        <div class="danger-zone">
+          <div class="dz-title">Danger zone</div>
+          <div class="dz-item">
+            <div class="dz-body">
+              <div class="dz-label">Export all data</div>
+              <div class="dz-desc">Download a full export of all your sessions, outputs, and account data in JSON format.</div>
+            </div>
+            <button class="dz-btn" onclick="showToast('Export started — you will receive an email when ready')">Export data</button>
+          </div>
+          <div class="dz-item">
+            <div class="dz-body">
+              <div class="dz-label">Delete all sessions</div>
+              <div class="dz-desc">Permanently delete all cascade sessions and their outputs. Your account will remain active.</div>
+            </div>
+            <button class="dz-btn" onclick="confirmAction('Delete all sessions? This cannot be undone.', 'All sessions deleted')">Delete sessions</button>
+          </div>
+          <div class="dz-item">
+            <div class="dz-body">
+              <div class="dz-label">Delete account</div>
+              <div class="dz-desc">Permanently delete your Karis Cascade account, all sessions, and all data. This cannot be undone.</div>
+            </div>
+            <button class="dz-btn" style="background:#EF4444;color:#fff;border-color:#EF4444" onclick="confirmAction('Delete your account permanently? This cannot be undone.', 'Deleting account…')">Delete my account</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- settings-content -->
+  </div><!-- settings-shell -->
+</div><!-- app-layout -->
+
+<!-- TOAST -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <i class="ti ti-circle-check" aria-hidden="true"></i>
+  <span id="toast-text">Saved</span>
+</div>
+
+<script>
+  /* ── PANEL NAVIGATION ── */
+  function showPanel(id, btn) {
+    document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sn-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── INLINE EDIT ── */
+  function editField(id) {
+    document.getElementById('field-' + id).style.display       = 'none';
+    document.getElementById('field-' + id + '-edit').style.display = 'grid';
+    document.getElementById('input-' + id)?.focus();
+  }
+  function cancelField(id) {
+    document.getElementById('field-' + id + '-edit').style.display = 'none';
+    document.getElementById('field-' + id).style.display            = '';
+  }
+  function saveField(id) {
+    const input = document.getElementById('input-' + id);
+    const val   = document.getElementById('val-' + id);
+    if (input && val) val.textContent = input.value || val.textContent;
+    cancelField(id);
+    showToast('Saved');
+  }
+
+  /* ── TOAST ── */
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-text').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  /* ── CONFIRM ACTION ── */
+  function confirmAction(question, successMsg) {
+    if (confirm(question)) showToast(successMsg);
+  }
+</script>
+
+</body>
+</html>
